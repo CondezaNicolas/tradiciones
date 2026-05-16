@@ -163,19 +163,19 @@ function EditionCard({ edition, onDelete }: { edition: Edition; onDelete: (id: s
       </Link>
 
       <div className="mt-3 flex items-center justify-between">
-        <div>
-          {isPublished && (
-            <a
-              href={`/ediciones/${edition.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 font-label text-[11px] font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary-container"
-            >
-              <MaterialIcon className="text-sm" name={MATERIAL_ICONS.visibility} />
-              Ver pública
-            </a>
-          )}
-        </div>
+        {isPublished ? (
+          <a
+            href={`/ediciones/${edition.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 font-label text-[11px] font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary-container"
+          >
+            <MaterialIcon className="text-sm" name={MATERIAL_ICONS.visibility} />
+            Ver pública
+          </a>
+        ) : (
+          <span />
+        )}
 
         {confirmDelete ? (
           <div className="flex items-center gap-2">
