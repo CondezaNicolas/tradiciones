@@ -95,15 +95,6 @@ export function Header() {
           </div>
         </div>
         <div className="flex items-center gap-6">
-          <div className="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-lg">
-            <span className="material-symbols-outlined text-outline text-sm">search</span>
-            <input
-              className="bg-transparent border-none focus:ring-0 text-sm placeholder:text-outline-variant font-body ml-2"
-              placeholder="Buscar historias..."
-              type="text"
-            />
-          </div>
-          
           <button
             className="md:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}

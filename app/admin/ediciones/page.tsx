@@ -11,6 +11,7 @@ import {
   MdAutoStories,
   MdChevronRight,
   MdCloudUpload,
+  MdDelete,
   MdEdit,
   MdSave,
   MdVisibility,
@@ -21,6 +22,7 @@ const MATERIAL_ICONS = {
   autoStories: MdAutoStories,
   chevronRight: MdChevronRight,
   cloudUpload: MdCloudUpload,
+  delete: MdDelete,
   edit: MdEdit,
   save: MdSave,
   visibility: MdVisibility,
@@ -89,8 +91,27 @@ function StatusBadge({ status }: { status: "draft" | "published" }) {
 
 /* ─────────────────────── Edition card ─────────────────────── */
 
-function EditionCard({ edition }: { edition: Edition }) {
+function EditionCard({ edition, onDelete }: { edition: Edition; onDelete: (id: string) => void }) {
   const isPublished = edition.status === "published";
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  function handleDeleteClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setConfirmDelete(true);
+  }
+
+  function handleConfirmDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete(edition.id);
+  }
+
+  function handleCancelDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setConfirmDelete(false);
+  }
 
   return (
     <div className="group relative">
@@ -141,18 +162,52 @@ function EditionCard({ edition }: { edition: Edition }) {
         </div>
       </Link>
 
-      {/* Public link for published editions */}
-      {isPublished && (
-        <a
-          href={`/ediciones/${edition.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 flex items-center gap-1.5 font-label text-[11px] font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary-container"
-        >
-          <MaterialIcon className="text-sm" name={MATERIAL_ICONS.visibility} />
-          Ver pública
-        </a>
-      )}
+      <div className="mt-3 flex items-center justify-between">
+        <div>
+          {isPublished && (
+            <a
+              href={`/ediciones/${edition.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 font-label text-[11px] font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary-container"
+            >
+              <MaterialIcon className="text-sm" name={MATERIAL_ICONS.visibility} />
+              Ver pública
+            </a>
+          )}
+        </div>
+
+        {confirmDelete ? (
+          <div className="flex items-center gap-2">
+            <span className="font-label text-[10px] uppercase tracking-widest text-error">
+              ¿Eliminar?
+            </span>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              className="rounded bg-error px-3 py-1 font-label text-[10px] font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-80"
+            >
+              Sí
+            </button>
+            <button
+              type="button"
+              onClick={handleCancelDelete}
+              className="rounded border border-outline-variant/30 px-3 py-1 font-label text-[10px] uppercase tracking-widest text-on-surface-variant transition-opacity hover:opacity-80"
+            >
+              No
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={handleDeleteClick}
+            className="flex items-center gap-1 font-label text-[11px] uppercase tracking-widest text-on-surface-variant/40 transition-colors hover:text-error"
+          >
+            <MaterialIcon className="text-sm" name={MATERIAL_ICONS.delete} />
+            Eliminar
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -513,6 +568,24 @@ export default function EdicionesPage() {
   const [editions, setEditions] = useState<Edition[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  async function handleDeleteEdition(id: string) {
+    if (deletingId) return;
+    setDeletingId(id);
+
+    try {
+      const res = await fetch(`/api/admin/editions/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        throw new Error("Error al eliminar la edición");
+      }
+      setEditions((prev) => prev.filter((e) => e.id !== id));
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : "Error al eliminar");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const fetchEditions = useCallback(async () => {
     setIsLoading(true);
@@ -595,7 +668,7 @@ export default function EdicionesPage() {
         ) : (
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {editions.map((edition) => (
-              <EditionCard key={edition.id} edition={edition} />
+              <EditionCard key={edition.id} edition={edition} onDelete={handleDeleteEdition} />
             ))}
           </div>
         )}
