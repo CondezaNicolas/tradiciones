@@ -162,50 +162,52 @@ function EditionCard({ edition, onDelete }: { edition: Edition; onDelete: (id: s
         </div>
       </Link>
 
-      <div className="mt-3 flex items-center justify-between">
-        {isPublished ? (
-          <a
-            href={`/ediciones/${edition.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 font-label text-[11px] font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary-container"
-          >
-            <MaterialIcon className="text-sm" name={MATERIAL_ICONS.visibility} />
-            Ver pública
-          </a>
-        ) : (
-          <span />
-        )}
+      <div className="mt-3 space-y-2">
+        <div className="flex items-center justify-between">
+          {isPublished ? (
+            <a
+              href={`/ediciones/${edition.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 font-label text-[11px] font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary-container"
+            >
+              <MaterialIcon className="text-sm" name={MATERIAL_ICONS.visibility} />
+              Ver pública
+            </a>
+          ) : (
+            <span />
+          )}
 
-        {confirmDelete ? (
-          <div className="flex items-center gap-2">
-            <span className="font-label text-[10px] uppercase tracking-widest text-error">
-              ¿Eliminar?
+          <button
+            type="button"
+            onClick={handleDeleteClick}
+            className="flex items-center gap-1 font-label text-[11px] uppercase tracking-widest text-on-surface-variant/60 transition-colors hover:text-error"
+          >
+            <MaterialIcon className="text-sm" name={MATERIAL_ICONS.delete} />
+            Eliminar
+          </button>
+        </div>
+
+        {confirmDelete && (
+          <div className="flex items-center justify-end gap-2 rounded-lg bg-error-container/30 px-3 py-2">
+            <span className="font-label text-[10px] font-bold uppercase tracking-widest text-error">
+              ¿Eliminar esta edición?
             </span>
             <button
               type="button"
               onClick={handleConfirmDelete}
               className="rounded bg-error px-3 py-1 font-label text-[10px] font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-80"
             >
-              Sí
+              Sí, eliminar
             </button>
             <button
               type="button"
               onClick={handleCancelDelete}
               className="rounded border border-outline-variant/30 px-3 py-1 font-label text-[10px] uppercase tracking-widest text-on-surface-variant transition-opacity hover:opacity-80"
             >
-              No
+              Cancelar
             </button>
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={handleDeleteClick}
-            className="flex items-center gap-1 font-label text-[11px] uppercase tracking-widest text-on-surface-variant/40 transition-colors hover:text-error"
-          >
-            <MaterialIcon className="text-sm" name={MATERIAL_ICONS.delete} />
-            Eliminar
-          </button>
         )}
       </div>
     </div>
