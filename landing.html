@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#ffffff",
+              "on-tertiary-fixed-variant": "#6d3a00",
+              "surface-bright": "#faf9f8",
+              "inverse-on-surface": "#f1f0f0",
+              "on-secondary-container": "#fffbff",
+              "tertiary-fixed": "#ffdcc2",
+              "secondary-container": "#dd3123",
+              "tertiary-container": "#683700",
+              "on-secondary-fixed": "#410000",
+              "primary": "#002675",
+              "tertiary": "#482400",
+              "surface-container-high": "#e9e8e7",
+              "inverse-primary": "#b5c4ff",
+              "outline": "#747684",
+              "surface-variant": "#e3e2e1",
+              "secondary-fixed": "#ffdad5",
+              "on-primary-fixed": "#00164e",
+              "on-error": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "surface": "#faf9f8",
+              "on-error-container": "#93000a",
+              "surface-container-highest": "#e3e2e1",
+              "on-surface-variant": "#434653",
+              "primary-container": "#0039a6",
+              "outline-variant": "#c4c5d5",
+              "on-secondary-fixed-variant": "#930001",
+              "surface-container-low": "#f4f3f2",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed": "#2e1500",
+              "on-surface": "#1a1c1c",
+              "primary-fixed": "#dce1ff",
+              "surface-container": "#eeeeed",
+              "background": "#faf9f8",
+              "on-primary-container": "#96adff",
+              "surface-dim": "#dadad9",
+              "tertiary-fixed-dim": "#ffb77b",
+              "on-background": "#1a1c1c",
+              "secondary": "#b8120b",
+              "error": "#ba1a1a",
+              "surface-tint": "#3056c2",
+              "on-primary-fixed-variant": "#093da9",
+              "secondary-fixed-dim": "#ffb4a8",
+              "on-tertiary-container": "#ed9f5b",
+              "primary-fixed-dim": "#b5c4ff",
+              "inverse-surface": "#2f3130",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#faf9f8]/80 backdrop-blur-md shadow-[0_32px_64px_-15px_rgba(26,28,28,0.04)]">
+<div class="flex justify-between items-center px-8 py-6 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-12">
+<a class="text-2xl font-serif italic text-[#002675]" href="#">Chile País de Tradiciones</a>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#b8120b] border-b-2 border-[#b8120b] pb-1 font-body text-sm tracking-wide" href="#">Inicio</a>
+<a class="text-[#1a1c1c] hover:text-[#002675] transition-opacity duration-300 font-body text-sm tracking-wide" href="#">Ediciones</a>
+<a class="text-[#1a1c1c] hover:text-[#002675] transition-opacity duration-300 font-body text-sm tracking-wide" href="#">Reservar</a>
+<a class="text-[#1a1c1c] hover:text-[#002675] transition-opacity duration-300 font-body text-sm tracking-wide" href="#">Contacto</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-surface-container-high px-4 py-2 rounded-lg">
+<span class="material-symbols-outlined text-outline text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm placeholder:text-outline-variant font-body ml-2" placeholder="Buscar historias..." type="text"/>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-md font-body text-sm font-semibold hover:opacity-80 transition-opacity active:scale-95 duration-100">
+                    Suscribirse
+                </button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative h-screen min-h-[800px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="dramatic wide shot of Torres del Paine granite peaks reflecting in a calm turquoise glacial lake during a soft pink sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTfLTe4-9BD6o-yObzL3WxOvt2GuuRBDGGEi5K9B4Q11fRxAXcMIO30ssa0TsCtaWH_UEghXve56DY2Qni1JKzghAxJ4_hBqIFbd8XU5t-BTR9tYEgkxOBUJK3u-Mhg97BlIcpZIipPiS4OBWX5oZWiwokEUiBLg7cikvrNmdFHy3fi7hJNgAudryCxGnb1k59gJDqIZ6oPXXVMALvyHpfzee2Q35CIZizoaJU6ZBkvVNw2cYOmrgJOqMgS-WZyvPRtwRAgqu2b_w"/>
+<div class="absolute inset-0 bg-gradient-to-r from-on-surface/60 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-screen-2xl mx-auto px-8 w-full">
+<div class="max-w-3xl">
+<span class="inline-block px-4 py-1.5 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs font-bold tracking-widest uppercase mb-6">EDICIÓN ESPECIAL</span>
+<h1 class="font-headline text-6xl md:text-8xl text-surface-container-lowest leading-[1.1] mb-8">
+                        El alma de la <br/><span class="italic">Cordillera</span>.
+                    </h1>
+<p class="text-surface-variant text-xl md:text-2xl font-body leading-relaxed mb-10 max-w-xl">
+                        Descubra las historias no contadas de los guardianes del patrimonio chileno, desde las cumbres de los Andes hasta los canales australes.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-md font-body text-lg font-semibold hover:opacity-90 transition-all flex items-center justify-center gap-3">
+                            Explorar la última edición
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="bg-surface-container-lowest/10 backdrop-blur-md text-surface-bright border border-surface-bright/20 px-8 py-4 rounded-md font-body text-lg font-semibold hover:bg-surface-bright/20 transition-all">
+                            Ver Archivo
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Ediciones Section -->
+<section class="py-24 bg-surface">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+<div class="max-w-2xl">
+<h2 class="font-headline text-4xl md:text-5xl text-on-surface mb-6">Ediciones Recientes</h2>
+<p class="text-on-surface-variant text-lg font-body leading-relaxed">
+                            Una curatería de relatos visuales y escritos que capturan la esencia de nuestra identidad nacional a través de las estaciones.
+                        </p>
+</div>
+<a class="text-primary font-bold flex items-center gap-2 group" href="#">
+                        Ver todas las ediciones
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">trending_flat</span>
+</a>
+</div>
+<!-- Grid Bento-inspired Layout -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- Card 1 -->
+<div class="group cursor-pointer">
+<div class="relative overflow-hidden aspect-[3/4] rounded-lg mb-6 shadow-[0_12px_24px_rgba(26,28,28,0.06)]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="majestic vertical view of Fitz Roy mountain range at dawn with misty forest in the foreground and warm morning glow" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtewkx0qP7C0bxkoLwzAJGxQmMMOZYL7rcna97YUNqcmnR9VS0oHu0GbWX8P5pj_aBElcBXmGnqtRpL_o-mEGdnQ2c6_MEMOseK_uVDsfKnjh_abQsEHkZkRxzumH2zrdC_o1yijCG7-uXG-A7EnhIz05Lfl0MywfWqwY1cHg1fpOJ1aV_8tO1188onxGq7MSdYcsFaVGydGiMd545893HUEu_oxmZVtp34P6LvNbQGTSVuLL91yCRN5hjY3KgzslZmhYepxe2qnk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent opacity-60"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<span class="bg-secondary text-on-secondary text-[10px] font-bold px-2 py-1 rounded tracking-widest mb-2 inline-block">JUNIO 2024</span>
+</div>
+</div>
+<h3 class="font-headline text-2xl text-on-surface mb-2">Patrimonio Natural</h3>
+<p class="text-on-surface-variant font-body">Explorando la biodiversidad única de los bosques milenarios de la Araucanía.</p>
+</div>
+<!-- Card 2 -->
+<div class="group cursor-pointer md:mt-12">
+<div class="relative overflow-hidden aspect-[3/4] rounded-lg mb-6 shadow-[0_12px_24px_rgba(26,28,28,0.06)]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="artisan ceramic plate with traditional Chilean curanto, steam rising, set on a rustic wooden table with native flowers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2sylqnyIB8CXxuMBNYoDtF3fDPDnJ5Wyvn7vPMzPvqtttE0HCQU0JgemD8vJCrdypVrKOy17Od7NNxU3fjN7zMMvgktE45Dve5LbIIExhw0QDNwaO4439rmD1Q2ezGretDgmaHI-wnaz-tKmTko0Sh27aGrcFwlZENNzIevbIPJqKuxWSFx5lRVfSUk2SIA5mF6TCeO_PROVGHgSdWUIQlwcJQZ0db-xuZ3ahgwZ6XZ25CHPvo_ZuJjiG5kiZqnDhr2lc7CgxZCA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent opacity-60"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<span class="bg-secondary text-on-secondary text-[10px] font-bold px-2 py-1 rounded tracking-widest mb-2 inline-block">MAYO 2024</span>
+</div>
+</div>
+<h3 class="font-headline text-2xl text-on-surface mb-2">Gastronomía del Sur</h3>
+<p class="text-on-surface-variant font-body">Un viaje sensorial por las cocinas de Chiloé y sus tradiciones ancestrales del fuego.</p>
+</div>
+<!-- Card 3 -->
+<div class="group cursor-pointer">
+<div class="relative overflow-hidden aspect-[3/4] rounded-lg mb-6 shadow-[0_12px_24px_rgba(26,28,28,0.06)]">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="vibrant carnival masks and dancers in colorful traditional costumes during Fiesta de la Tirana in the Atacama desert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYE488tcdsw1LCugXiHjlNDuQOGog7rAXJct4guzZDSqW-n1y3feO1hbXhGJFZXiv9BmMaX7QEZeClTr690TpWhAsuz_suLEb7Lu3SLbXVZl98t4M_0LLbWQuEB4WTvVodf1UMdKmuktqvHOX3GVTi5cSI8-s8gtJAxAZteVj2CFrqHdPbFO1FU1RuszBxhDo5SOjQmzPNcYX0w6YS4_T7l9t-kbjI0Fc-jqclhkSQPA49VEALuW8IPSJFuotWJLKgO_vDEMkqJPw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent opacity-60"></div>
+<div class="absolute bottom-6 left-6 right-6">
+<span class="bg-secondary text-on-secondary text-[10px] font-bold px-2 py-1 rounded tracking-widest mb-2 inline-block">ABRIL 2024</span>
+</div>
+</div>
+<h3 class="font-headline text-2xl text-on-surface mb-2">Fiestas de la Tirana</h3>
+<p class="text-on-surface-variant font-body">El fervor religioso y la explosión de color en el corazón del desierto más árido del mundo.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Reserva de Horas Section -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="flex flex-col lg:flex-row gap-20 items-start">
+<div class="lg:w-1/2">
+<h2 class="font-headline text-4xl md:text-5xl text-on-surface mb-8">Conectemos en Persona</h2>
+<p class="text-on-surface-variant text-lg font-body leading-relaxed mb-8">
+                            Nuestra sala de redacción está abierta para entrevistas con portadores de tradición, colaboraciones editoriales y consultas sobre nuestro archivo patrimonial. Reserve un espacio en nuestra agenda.
+                        </p>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed shrink-0">
+<span class="material-symbols-outlined">event_available</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Entrevistas Editoriales</h4>
+<p class="text-on-surface-variant text-sm">Sesiones de 45 minutos para capturar testimonios orales.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed shrink-0">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Consulta de Archivo</h4>
+<p class="text-on-surface-variant text-sm">Acceso guiado a nuestra biblioteca de fotografías históricas.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:w-1/2 w-full">
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_32px_64px_-15px_rgba(26,28,28,0.04)] border border-outline-variant/10">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline text-2xl text-on-surface">Agendar Cita</h3>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Calendar Placeholder Grid -->
+<div class="mb-8">
+<p class="text-on-surface-variant text-sm font-bold uppercase tracking-wider mb-4">Julio 2024</p>
+<div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-outline mb-4">
+<div>LU</div><div>MA</div><div>MI</div><div>JU</div><div>VI</div><div>SA</div><div>DO</div>
+</div>
+<div class="grid grid-cols-7 gap-2">
+<div class="h-10 flex items-center justify-center text-outline-variant">26</div>
+<div class="h-10 flex items-center justify-center text-outline-variant">27</div>
+<div class="h-10 flex items-center justify-center text-outline-variant">28</div>
+<div class="h-10 flex items-center justify-center text-outline-variant">29</div>
+<div class="h-10 flex items-center justify-center text-outline-variant">30</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">1</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">2</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">3</div>
+<div class="h-10 flex items-center justify-center font-body bg-secondary text-on-secondary rounded-full cursor-pointer shadow-lg shadow-secondary/20">4</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">5</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">6</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">7</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">8</div>
+<div class="h-10 flex items-center justify-center font-body hover:bg-surface-container-high rounded cursor-pointer transition-colors">9</div>
+<!-- ... rest of days ... -->
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-md font-body font-bold hover:bg-primary-container transition-colors">
+                                Confirmar Selección
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter Section -->
+<section class="py-24 bg-surface">
+<div class="max-w-4xl mx-auto px-8 text-center">
+<div class="inline-block p-4 bg-tertiary-fixed rounded-full mb-8">
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant text-4xl">mail_lock</span>
+</div>
+<h2 class="font-headline text-4xl md:text-5xl text-on-surface mb-6">Crónicas en su Bandeja</h2>
+<p class="text-on-surface-variant text-lg font-body leading-relaxed mb-12">
+                    Únase a nuestra comunidad de más de 15,000 lectores y reciba cada semana una historia exclusiva sobre el patrimonio inmaterial de Chile.
+                </p>
+<form class="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
+<input class="flex-grow bg-surface-container-high border-none rounded-md px-6 py-4 focus:ring-2 focus:ring-secondary focus:ring-offset-2 transition-all font-body" placeholder="Su correo electrónico" type="email"/>
+<button class="bg-secondary text-on-secondary px-8 py-4 rounded-md font-body font-bold hover:opacity-90 transition-all shadow-lg shadow-secondary/10" type="submit">
+                        Suscribirme ahora
+                    </button>
+</form>
+<p class="mt-6 text-outline text-xs font-body">Respetamos su privacidad. Cancele su suscripción en cualquier momento.</p>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#f4f3f2] dark:bg-[#1a1c1c] text-[#002675]">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-20 w-full max-w-screen-2xl mx-auto">
+<div class="md:col-span-1">
+<a class="text-xl font-serif text-[#1a1c1c] dark:text-[#faf9f8] mb-6 block" href="#">Chile País de Tradiciones</a>
+<p class="text-[#5c5e5e] dark:text-[#c4c5d5] font-sans text-sm leading-relaxed">
+                    Preservando la riqueza cultural de Chile a través del periodismo de alta gama y la fotografía documental.
+                </p>
+</div>
+<div>
+<h4 class="font-bold text-sm uppercase tracking-widest text-[#1a1c1c] dark:text-[#faf9f8] mb-6">Contenidos</h4>
+<ul class="space-y-4">
+<li><a class="text-[#5c5e5e] dark:text-[#c4c5d5] hover:text-[#b8120b] transition-colors font-sans text-sm" href="#">Cultura</a></li>
+<li><a class="text-[#5c5e5e] dark:text-[#c4c5d5] hover:text-[#b8120b] transition-colors font-sans text-sm" href="#">Gastronomía</a></li>
+<li><a class="text-[#5c5e5e] dark:text-[#c4c5d5] hover:text-[#b8120b] transition-colors font-sans text-sm" href="#">Arquitectura</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-sm uppercase tracking-widest text-[#1a1c1c] dark:text-[#faf9f8] mb-6">Editorial</h4>
+<ul class="space-y-4">
+<li><a class="text-[#5c5e5e] dark:text-[#c4c5d5] hover:text-[#b8120b] transition-colors font-sans text-sm" href="#">Privacidad</a></li>
+<li><a class="text-[#5c5e5e] dark:text-[#c4c5d5] hover:text-[#b8120b] transition-colors font-sans text-sm" href="#">Términos</a></li>
+<li><a class="text-[#5c5e5e] dark:text-[#c4c5d5] hover:text-[#b8120b] transition-colors font-sans text-sm" href="#">Staff</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-sm uppercase tracking-widest text-[#1a1c1c] dark:text-[#faf9f8] mb-6">Redes</h4>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-[#1a1c1c] hover:bg-primary hover:text-on-primary transition-all" href="#">
+<span class="material-symbols-outlined text-lg">share</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-[#1a1c1c] hover:bg-primary hover:text-on-primary transition-all" href="#">
+<span class="material-symbols-outlined text-lg">photo_camera</span>
+</a>
+</div>
+</div>
+</div>
+<div class="border-t border-outline-variant/10 px-12 py-8 text-center">
+<p class="text-[#5c5e5e] dark:text-[#c4c5d5] font-sans text-xs tracking-wide">
+                © 2024 Chile País de Tradiciones. Una publicación de Andina Editorial.
+            </p>
+</div>
+</footer>
+</body></html>

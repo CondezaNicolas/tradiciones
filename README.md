@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tradiciones
 
-## Getting Started
+Revista digital con editor visual de ediciones y lector publico tipo magazine.
 
-First, run the development server:
+## Stack actual
+
+- `Next.js 16` + `React 19`
+- `Drizzle ORM`
+- `SQLite` temporal para desarrollo local
+- `Fabric.js` para el editor visual
+- `JWT` en cookie httpOnly para admin
+
+## Estado actual de arquitectura
+
+Hoy el proyecto queda simplificado para laburar local sin depender de Postgres.
+
+Actualmente:
+
+- base de datos: `SQLite` via `DATABASE_FILE`
+- storage: `local` o `Supabase Storage` segun `STORAGE_PROVIDER`
+- auth admin: cookie `session` firmada con `JWT_SECRET`
+
+## Variables de entorno
+
+Copiá `.env.example` a `.env.local`.
+
+Variables minimas para desarrollo:
+
+```env
+DATABASE_FILE=./data/tradiciones.sqlite
+JWT_SECRET=un-secreto-largo-y-distinto
+STORAGE_PROVIDER=local
+```
+
+## Desarrollo local
+
+Instalar dependencias:
+
+```bash
+npm install
+```
+
+Preparar base de datos:
+
+```bash
+npm run db:push
+npm run db:seed
+```
+
+Levantar entorno:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Accesos utiles:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- sitio publico: `http://localhost:3000`
+- admin login: `http://localhost:3000/admin/login`
+- editor de una edicion: `http://localhost:3000/admin/ediciones/[id]`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+- `npm run dev` - desarrollo con webpack
+- `npm run dev:turbo` - desarrollo con turbopack
+- `npm run lint` - lint
+- `npm run db:push` - sincroniza schema SQLite a la base local
+- `npm run db:studio` - abre Drizzle Studio
+- `npm run db:seed` - crea usuario admin inicial
 
-To learn more about Next.js, take a look at the following resources:
+## Como se guarda la informacion
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `editions` - metadata de la revista
+- `pages` - paginas, `fabric_json` y `thumbnail_url`
+- `images` - imagenes subidas para una edicion
+- `admin_users` - usuarios admin
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Archivos fisicos:
 
-## Deploy on Vercel
+- local dev: `public/uploads`
+- prod barato: `Supabase Storage`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Nota temporal
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este setup queda orientado a destrabar desarrollo local rapido con SQLite. Si despues querés volver a Postgres, hay que reconfigurar `lib/db`, `lib/db/schema.ts` y `drizzle.config.ts`.

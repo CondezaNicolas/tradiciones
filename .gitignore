@@ -32,9 +32,23 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# database
+/data/
+
+# uploaded files
+/public/uploads/
 
 # vercel
 .vercel
+
+# debug logs
+next-debug.log
+
+# temp
+.tmp/
+nul
 
 # typescript
 *.tsbuildinfo
