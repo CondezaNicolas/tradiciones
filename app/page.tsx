@@ -7,6 +7,8 @@ import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
 import { AgendaContacto } from "@/components/agenda-contacto";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const db = getDb();
 
