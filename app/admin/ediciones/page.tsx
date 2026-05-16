@@ -261,6 +261,33 @@ function CreateForm({ onCancel }: { onCancel: () => void }) {
     resumen.trim() !== "" &&
     imagenPortada !== null;
 
+  async function compressImage(file: File): Promise<File> {
+    const MAX_DIM = 2400;
+    const QUALITY = 0.85;
+    const mimeType = file.type === "image/png" ? "image/png" : "image/jpeg";
+
+    const bitmap = await createImageBitmap(file);
+    let w = bitmap.width;
+    let h = bitmap.height;
+    if (w > MAX_DIM || h > MAX_DIM) {
+      if (w > h) { h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
+      else { w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    canvas.getContext("2d")!.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close();
+
+    const blob: Blob | null = await new Promise((resolve) => {
+      canvas.toBlob(resolve, mimeType, QUALITY);
+    });
+
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.\w+$/, mimeType === "image/png" ? ".png" : ".jpg"), { type: mimeType });
+  }
+
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -304,8 +331,9 @@ function CreateForm({ onCancel }: { onCancel: () => void }) {
 
       // Step 2: Upload cover image if a file was selected
       if (coverFile) {
+        const compressed = await compressImage(coverFile);
         const uploadFormData = new FormData();
-        uploadFormData.append("file", coverFile);
+        uploadFormData.append("file", compressed);
 
         const uploadResponse = await fetch("/api/admin/upload", {
           method: "POST",
