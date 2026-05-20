@@ -26,6 +26,7 @@ function EdicionCard({ edicion, index }: { edicion: Edicion; index: number }) {
             src={edicion.imagen}
             alt={edicion.alt}
             fill
+            sizes="(max-width: 768px) 100vw, 33vw"
           />
         ) : (
           <div className="w-full h-full bg-surface-container-high flex items-center justify-center">
@@ -52,7 +53,7 @@ function EdicionCard({ edicion, index }: { edicion: Edicion; index: number }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+      <div className="size-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
         <IoNewspaperOutline className="text-4xl text-primary/50" />
       </div>
       <h3 className="font-headline text-xl text-on-surface mb-2">
@@ -66,8 +67,10 @@ function EmptyState() {
   );
 }
 
+const EMPTY_EDICIONES: Edicion[] = [];
+
 export function EdicionesRecientes({
-  ediciones = [],
+  ediciones = EMPTY_EDICIONES,
 }: {
   ediciones?: Edicion[];
 }) {

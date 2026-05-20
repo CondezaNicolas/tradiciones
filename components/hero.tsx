@@ -23,6 +23,7 @@ export function Hero({
           alt="Torres del Paine granite peaks reflecting in a calm turquoise glacial lake during sunrise"
           fill
           priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-on-surface/60 to-transparent" />
       </div>

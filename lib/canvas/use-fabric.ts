@@ -1,6 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useReducer } from "react";
+
+// Cache the dynamic import so awaits in effects resolve immediately after first load
+let fabricModuleCache: Promise<typeof import("fabric")> | null = null;
+function loadFabricModule() {
+  if (!fabricModuleCache) fabricModuleCache = import("fabric");
+  return fabricModuleCache;
+}
+
+interface FabricState {
+  fabricCanvas: InstanceType<typeof import("fabric").Canvas> | null;
+  isReady: boolean;
+}
+
+type FabricAction =
+  | { type: "initialized"; canvas: InstanceType<typeof import("fabric").Canvas> }
+  | { type: "reset" };
 
 interface UseFabricReturn {
   fabricCanvas: InstanceType<typeof import("fabric").Canvas> | null;
@@ -14,7 +30,15 @@ export function useFabric(
 ): UseFabricReturn {
   const fabricCanvasRef = useRef<InstanceType<typeof import("fabric").Canvas> | null>(null);
   const mountedRef = useRef(false);
-  const [isReady, setIsReady] = useState(false);
+  const [state, dispatch] = useReducer(
+    (prev: FabricState, action: FabricAction): FabricState => {
+      switch (action.type) {
+        case "initialized": return { fabricCanvas: action.canvas, isReady: true };
+        case "reset": return { fabricCanvas: null, isReady: false };
+      }
+    },
+    { fabricCanvas: null, isReady: false },
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -25,19 +49,21 @@ export function useFabric(
 
     let cancelled = false;
 
-    async function init() {
-      const { Canvas } = await import("fabric");
-
+    function init() {
       if (cancelled || !canvasRef.current) return;
 
-      const fc = new Canvas(canvasRef.current, {
-        width,
-        height,
-        backgroundColor: "#ffffff",
-      });
+      loadFabricModule().then((fabricModule) => {
+        if (cancelled || !canvasRef.current) return;
 
-      fabricCanvasRef.current = fc;
-      setIsReady(true);
+        const fc = new fabricModule.Canvas(canvasRef.current, {
+          width,
+          height,
+          backgroundColor: "#ffffff",
+        });
+
+        fabricCanvasRef.current = fc;
+        dispatch({ type: "initialized", canvas: fc });
+      });
     }
 
     init();
@@ -51,9 +77,9 @@ export function useFabric(
         fabricCanvasRef.current = null;
       }
 
-      setIsReady(false);
+      dispatch({ type: "reset" });
     };
   }, [canvasRef, width, height]);
 
-  return { fabricCanvas: fabricCanvasRef.current, isReady };
+  return state;
 }

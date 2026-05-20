@@ -85,7 +85,7 @@ export default function EditorToolbar() {
                   })
                 }
                 title="Negrita"
-                className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${
+                className={`flex size-8 items-center justify-center rounded transition-colors ${
                   isBold
                     ? "bg-primary/15 text-primary"
                     : "text-on-surface-variant hover:bg-surface-container-high"
@@ -102,7 +102,7 @@ export default function EditorToolbar() {
                   })
                 }
                 title="Itálica"
-                className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${
+                className={`flex size-8 items-center justify-center rounded transition-colors ${
                   isItalic
                     ? "bg-primary/15 text-primary"
                     : "text-on-surface-variant hover:bg-surface-container-high"
@@ -114,9 +114,10 @@ export default function EditorToolbar() {
               <Divider />
 
               <label
-                className="relative flex h-8 w-8 items-center justify-center"
+                className="relative flex size-8 items-center justify-center"
                 title="Color"
               >
+                <span className="sr-only">Color del texto</span>
                 <input
                   type="color"
                   value={fill}
@@ -126,7 +127,7 @@ export default function EditorToolbar() {
                   className="absolute inset-0 cursor-pointer opacity-0"
                 />
                 <div
-                  className="h-5 w-5 rounded-full border border-outline-variant/40"
+                  className="size-5 rounded-full border border-outline-variant/40"
                   style={{ backgroundColor: fill }}
                 />
               </label>
@@ -171,7 +172,7 @@ export default function EditorToolbar() {
             type="button"
             onClick={bringToFront}
             title="Traer al frente"
-            className="flex h-8 w-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container-high"
+            className="flex size-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container-high"
           >
             <MdFlipToFront size={16} />
           </button>
@@ -180,7 +181,7 @@ export default function EditorToolbar() {
             type="button"
             onClick={sendToBack}
             title="Enviar atrás"
-            className="flex h-8 w-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container-high"
+            className="flex size-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-surface-container-high"
           >
             <MdFlipToBack size={16} />
           </button>
@@ -192,7 +193,7 @@ export default function EditorToolbar() {
             type="button"
             onClick={deleteSelected}
             title="Eliminar"
-            className="flex h-8 w-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-error-container hover:text-error"
+            className="flex size-8 items-center justify-center rounded text-on-surface-variant transition-colors hover:bg-error-container hover:text-error"
           >
             <MdDeleteOutline size={16} />
           </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { useFabric } from "@/lib/canvas/use-fabric";
 import * as pageStore from "@/lib/canvas/page-store";
 import { useCanvasContext } from "@/components/canvas/canvas-provider";
@@ -13,6 +13,17 @@ interface CanvasEditorProps {
   onSave?: (thumbnail: string) => void;
 }
 
+type SaveState = { showIndicator: false } | { showIndicator: true; hideAt: number };
+
+function saveReducer(state: SaveState, action: { type: "show" } | { type: "hide" }): SaveState {
+  switch (action.type) {
+    case "show":
+      return { showIndicator: true, hideAt: Date.now() + 2000 };
+    case "hide":
+      return { showIndicator: false };
+  }
+}
+
 export default function CanvasEditor({ pageIndex, width, height, editionId, onSave }: CanvasEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { fabricCanvas, isReady } = useFabric(canvasRef, width, height);
@@ -20,8 +31,7 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
   const hasLoadedRef = useRef(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const moveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [showSaveIndicator, setShowSaveIndicator] = useState(false);
-  const saveIndicatorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [saveState, dispatch] = useReducer(saveReducer, { showIndicator: false });
   const onSaveRef = useRef(onSave);
   useEffect(() => {
     onSaveRef.current = onSave;
@@ -70,13 +80,7 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
       }
 
       // Show save indicator briefly
-      setShowSaveIndicator(true);
-      if (saveIndicatorTimeoutRef.current) {
-        clearTimeout(saveIndicatorTimeoutRef.current);
-      }
-      saveIndicatorTimeoutRef.current = setTimeout(() => {
-        setShowSaveIndicator(false);
-      }, 2000);
+      dispatch({ type: "show" });
     };
 
     const debouncedSave = () => {
@@ -179,11 +183,15 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
       if (moveTimeoutRef.current) {
         clearTimeout(moveTimeoutRef.current);
       }
-      if (saveIndicatorTimeoutRef.current) {
-        clearTimeout(saveIndicatorTimeoutRef.current);
-      }
     };
   }, [isReady, fabricCanvas, pageIndex, editionId, registerCanvas, unregisterCanvas]);
+
+  // Auto-hide save indicator after 2 seconds
+  useEffect(() => {
+    if (!saveState.showIndicator) return;
+    const id = setTimeout(() => dispatch({ type: "hide" }), 2000);
+    return () => clearTimeout(id);
+  }, [saveState.showIndicator]);
 
   return (
     <div
@@ -201,7 +209,7 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
       {/* Save indicator — fades in/out */}
       <div
         className="pointer-events-none absolute right-2 bottom-2 rounded bg-on-surface/70 px-2 py-0.5 font-label text-[10px] text-white transition-opacity duration-500"
-        style={{ opacity: showSaveIndicator ? 1 : 0 }}
+        style={{ opacity: saveState.showIndicator ? 1 : 0 }}
       >
         Guardado ✓
       </div>

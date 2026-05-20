@@ -164,3 +164,6 @@ section[id] {
 /* Scrollbar hide utility */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Flip animation — only promote during active animation */
+.will-change-transform { will-change: transform; }

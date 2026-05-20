@@ -3,10 +3,10 @@
 import {
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useRef,
   useState,
+  use,
   type ReactNode,
 } from "react";
 import type { Canvas, FabricObject } from "fabric";
@@ -46,7 +46,7 @@ const CanvasContext = createContext<CanvasContextValue | null>(null);
 /* ────────────────────────── Hook ────────────────────────── */
 
 export function useCanvasContext(): CanvasContextValue {
-  const ctx = useContext(CanvasContext);
+  const ctx = use(CanvasContext);
   if (!ctx) {
     throw new Error("useCanvasContext must be used within a CanvasProvider");
   }

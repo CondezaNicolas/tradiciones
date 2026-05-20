@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer } from "react";
 import type { IconType } from "react-icons";
 import { MdChevronRight, MdLock, MdCheck, MdError } from "react-icons/md";
 
@@ -10,50 +10,61 @@ function MaterialIcon({ className, name }: { className?: string; name: IconType 
 }
 
 export default function ConfiguracionPage() {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [form, dispatch] = useReducer(
+    (state: {
+      currentPassword: string;
+      newPassword: string;
+      confirmPassword: string;
+      isSubmitting: boolean;
+      message: { type: "success" | "error"; text: string } | null;
+    }, action:
+      | { type: "field"; field: "currentPassword" | "newPassword" | "confirmPassword"; value: string }
+      | { type: "submit" }
+      | { type: "success" }
+      | { type: "error"; text: string }
+      | { type: "done" }) => {
+      switch (action.type) {
+        case "field": return { ...state, [action.field]: action.value };
+        case "submit": return { ...state, isSubmitting: true, message: null };
+        case "success": return { ...state, isSubmitting: false, currentPassword: "", newPassword: "", confirmPassword: "", message: { type: "success" as const, text: "Contraseña actualizada correctamente" } };
+        case "error": return { ...state, isSubmitting: false, message: { type: "error" as const, text: action.text } };
+        case "done": return { ...state, isSubmitting: false };
+      }
+    },
+    { currentPassword: "", newPassword: "", confirmPassword: "", isSubmitting: false, message: null },
+  );
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setMessage(null);
+    dispatch({ type: "submit" });
 
-    if (newPassword !== confirmPassword) {
-      setMessage({ type: "error", text: "Las contraseñas no coinciden" });
+    if (form.newPassword !== form.confirmPassword) {
+      dispatch({ type: "error", text: "Las contraseñas no coinciden" });
       return;
     }
 
-    if (newPassword.length < 8) {
-      setMessage({ type: "error", text: "La nueva contraseña debe tener al menos 8 caracteres" });
+    if (form.newPassword.length < 8) {
+      dispatch({ type: "error", text: "La nueva contraseña debe tener al menos 8 caracteres" });
       return;
     }
-
-    setIsSubmitting(true);
 
     try {
       const res = await fetch("/api/admin/password", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword: form.currentPassword, newPassword: form.newPassword }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setMessage({ type: "error", text: data.error ?? "Error al cambiar la contraseña" });
+        dispatch({ type: "error", text: data.error ?? "Error al cambiar la contraseña" });
         return;
       }
 
-      setMessage({ type: "success", text: "Contraseña actualizada correctamente" });
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      dispatch({ type: "success" });
     } catch {
-      setMessage({ type: "error", text: "Error de conexión. Intenta de nuevo." });
-    } finally {
-      setIsSubmitting(false);
+      dispatch({ type: "error", text: "Error de conexión. Intenta de nuevo." });
     }
   }
 
@@ -87,20 +98,20 @@ export default function ConfiguracionPage() {
               </div>
             </div>
 
-            {message && (
+            {form.message && (
               <div
                 className={[
                   "flex items-center gap-2 rounded-lg px-4 py-3",
-                  message.type === "success"
+                  form.message.type === "success"
                     ? "bg-green-50 text-green-700"
                     : "bg-error-container/50 text-error",
                 ].join(" ")}
               >
                 <MaterialIcon
                   className="text-sm"
-                  name={message.type === "success" ? MdCheck : MdError}
+                  name={form.message.type === "success" ? MdCheck : MdError}
                 />
-                <p className="font-label text-sm">{message.text}</p>
+                <p className="font-label text-sm">{form.message.text}</p>
               </div>
             )}
 
@@ -117,8 +128,8 @@ export default function ConfiguracionPage() {
                   type="password"
                   required
                   autoComplete="current-password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  value={form.currentPassword}
+                  onChange={(e) => dispatch({ type: "field", field: "currentPassword", value: e.target.value })}
                   className="w-full rounded-lg border border-outline-variant/40 bg-surface px-4 py-3 font-body text-sm text-on-surface transition-colors placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none"
                   placeholder="••••••••"
                 />
@@ -136,8 +147,8 @@ export default function ConfiguracionPage() {
                   type="password"
                   required
                   autoComplete="new-password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  value={form.newPassword}
+                  onChange={(e) => dispatch({ type: "field", field: "newPassword", value: e.target.value })}
                   className="w-full rounded-lg border border-outline-variant/40 bg-surface px-4 py-3 font-body text-sm text-on-surface transition-colors placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none"
                   placeholder="Mínimo 8 caracteres"
                 />
@@ -155,8 +166,8 @@ export default function ConfiguracionPage() {
                   type="password"
                   required
                   autoComplete="new-password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  value={form.confirmPassword}
+                  onChange={(e) => dispatch({ type: "field", field: "confirmPassword", value: e.target.value })}
                   className="w-full rounded-lg border border-outline-variant/40 bg-surface px-4 py-3 font-body text-sm text-on-surface transition-colors placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none"
                   placeholder="Repetir nueva contraseña"
                 />
@@ -164,10 +175,10 @@ export default function ConfiguracionPage() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={form.isSubmitting}
                 className="cursor-pointer rounded-md bg-gradient-to-br from-primary to-primary-container px-8 py-3 font-label text-sm tracking-wide text-white shadow-lg shadow-primary/10 transition-opacity hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isSubmitting ? "Guardando..." : "Actualizar Contraseña"}
+                {form.isSubmitting ? "Guardando..." : "Actualizar Contraseña"}
               </button>
             </form>
           </section>

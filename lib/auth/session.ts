@@ -14,8 +14,7 @@ const COOKIE_OPTIONS = {
  * Create a session by signing a JWT and setting it as an httpOnly cookie.
  */
 export async function setSession(payload: SessionPayload): Promise<void> {
-  const token = await signJwt(payload);
-  const cookieStore = await cookies();
+  const [token, cookieStore] = await Promise.all([signJwt(payload), cookies()]);
   cookieStore.set(SESSION_COOKIE, token, COOKIE_OPTIONS);
 }
 

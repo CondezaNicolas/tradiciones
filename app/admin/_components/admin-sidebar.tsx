@@ -49,8 +49,8 @@ function MaterialIcon({ className, name }: MaterialIconProps) {
 }
 
 export function AdminSidebar() {
+  const { push, refresh } = useRouter();
   const pathname = usePathname();
-  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   async function handleLogout() {
@@ -60,8 +60,8 @@ export function AdminSidebar() {
 
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/");
-      router.refresh();
+      push("/");
+      refresh();
     } finally {
       setIsLoggingOut(false);
     }
@@ -83,7 +83,7 @@ export function AdminSidebar() {
           </p>
         </div>
 
-        <nav className="no-scrollbar flex-1 space-y-1 overflow-y-auto max-[980px]:grid max-[980px]:gap-1 max-[980px]:space-y-0">
+        <nav className="no-scrollbar flex-1 gap-y-1 overflow-y-auto max-[980px]:grid max-[980px]:gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
 

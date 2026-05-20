@@ -19,8 +19,10 @@ export function Header() {
 
   useEffect(() => {
     const sectionEls = sections
-      .map((id) => document.getElementById(id))
-      .filter(Boolean) as HTMLElement[];
+      .flatMap((id) => {
+        const el = document.getElementById(id);
+        return el ? [el] : [];
+      });
 
     if (sectionEls.length === 0) return;
 

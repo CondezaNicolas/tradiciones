@@ -6,9 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SiteBrand } from "@/components/site-brand";
 
 function LoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
+  const { push, refresh } = useRouter();
+  const { get } = useSearchParams();
+  const callbackUrl = get("callbackUrl") ?? "/admin";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,8 +34,8 @@ function LoginForm() {
         return;
       }
 
-      router.push(callbackUrl);
-      router.refresh();
+      push(callbackUrl);
+      refresh();
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
     } finally {
