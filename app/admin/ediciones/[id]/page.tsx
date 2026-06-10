@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import { EditionEditorClient, type EditionData } from "./edition-editor-client";
+import { getDb } from "@/lib/db";
+import { editions } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 interface EditionEditorPageProps {
   params: Promise<{ id: string }>;
@@ -8,22 +10,24 @@ interface EditionEditorPageProps {
 
 export default async function EditionEditorPage({ params }: EditionEditorPageProps) {
   const { id } = await params;
-  const headersList = await headers();
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/admin/editions/${id}`, {
-    cache: "no-store",
-    headers: {
-      cookie: headersList.get("cookie") ?? "",
-    },
+  const db = getDb();
+  const edition = await db.query.editions.findFirst({
+    where: eq(editions.id, id),
   });
 
-  if (!res.ok) {
-    if (res.status === 404) notFound();
-    throw new Error("Error al cargar la edición");
-  }
+  if (!edition) notFound();
 
-  const edition: EditionData = await res.json();
+  const editionData: EditionData = {
+    id: edition.id,
+    title: edition.title,
+    category: edition.category,
+    month: edition.month,
+    year: edition.year,
+    summary: edition.summary,
+    coverImageUrl: edition.coverImageUrl,
+    status: edition.status,
+  };
 
-  return <EditionEditorClient initialEdition={edition} />;
+  return <EditionEditorClient initialEdition={editionData} />;
 }
