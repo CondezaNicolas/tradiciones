@@ -61,9 +61,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ url }, { status: 200 });
-  } catch {
+  } catch (err) {
+    console.error("[upload]", err);
+    const message = err instanceof Error ? err.message : "Error al subir el archivo";
     return NextResponse.json(
-      { error: "Error al subir el archivo" },
+      { error: message },
       { status: 500 },
     );
   }
