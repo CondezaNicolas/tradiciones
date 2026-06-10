@@ -116,7 +116,7 @@ export function useBookFlip(
   const isOpen = book.isOpen;
   const currentSpread = book.currentSpread;
   const totalPages = book.totalPages;
-  const totalSpreads = Math.floor(totalPages / 2);
+  const totalSpreads = Math.ceil(totalPages / 2);
   const canAddPages = totalPages < maxPages;
 
   /* ── Flip animation reducer ── */
