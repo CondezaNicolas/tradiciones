@@ -2,22 +2,12 @@
 
 import { MaterialIcon, MATERIAL_ICONS } from "./material-icon";
 
-type WizardStep = "template" | "details";
-
 interface EditionFormHeaderProps {
   onCancel: () => void;
   isSubmitting: boolean;
-  wizardStep?: WizardStep;
 }
 
-export function EditionFormHeader({ onCancel, isSubmitting, wizardStep }: EditionFormHeaderProps) {
-  const stepLabel =
-    wizardStep === "template"
-      ? "ELEGIR PLANTILLA"
-      : wizardStep === "details"
-        ? "DETALLES"
-        : null;
-
+export function EditionFormHeader({ onCancel, isSubmitting }: EditionFormHeaderProps) {
   return (
     <header className="sticky top-0 z-30 flex items-end justify-between gap-6 bg-surface/80 px-12 py-8 backdrop-blur-md max-[980px]:flex-col max-[980px]:items-start max-[980px]:px-5 max-[980px]:py-6">
       <div>
@@ -31,12 +21,6 @@ export function EditionFormHeader({ onCancel, isSubmitting, wizardStep }: Editio
           </button>
           <MaterialIcon className="text-[12px]" name={MATERIAL_ICONS.chevronRight} />
           <span className="font-bold text-primary">NUEVA EDICIÓN</span>
-          {stepLabel && (
-            <>
-              <MaterialIcon className="text-[12px]" name={MATERIAL_ICONS.chevronRight} />
-              <span className="font-bold text-primary">{stepLabel}</span>
-            </>
-          )}
         </nav>
         <h2 className="font-headline text-4xl font-light text-on-surface max-[980px]:text-[2.4rem]">
           Crear Nueva Edición

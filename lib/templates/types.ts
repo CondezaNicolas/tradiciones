@@ -1,48 +1,30 @@
 /**
- * Template system types for magazine editions.
+ * Page template types for magazine editions.
  *
  * Templates are static TypeScript data — no database, no API.
- * Each template provides pre-designed Fabric.js page layouts
- * so admins start from curated starting points instead of blank canvases.
+ * Each template represents a SINGLE page layout (not multi-page).
+ * Templates are themed by season: Invierno (winter) or Verano (summer).
  */
 
-/* ────────────────────────── Categories ────────────────────────── */
+/* ────────────────────────── Themes ────────────────────────── */
 
-export const TEMPLATE_CATEGORIES = [
-  "Cultura",
-  "Gastronomía",
-  "Arquitectura",
-  "Naturaleza",
-] as const;
+export const THEMES = ["invierno", "verano"] as const;
 
-export type TemplateCategory = (typeof TEMPLATE_CATEGORIES)[number];
+export type PageTheme = (typeof THEMES)[number];
 
-/* ────────────────────────── Page ────────────────────────── */
+/* ────────────────────────── Page Template ────────────────────────── */
 
-export interface TemplatePage {
-  /** 1-based page index */
-  pageNumber: number;
-  /** JSON object compatible with Fabric.js canvas.loadFromJSON() */
-  fabricJson: Record<string, unknown>;
-}
-
-/* ────────────────────────── Template ────────────────────────── */
-
-export interface MagazineTemplate {
-  /** Unique identifier (e.g. "cultura-feature") */
+export interface PageTemplate {
+  /** Unique identifier (e.g. "invierno-portada") */
   id: string;
-  /** Human-readable display name */
+  /** Human-readable display name in Spanish */
   name: string;
-  /** Short description of template purpose */
+  /** Short description of the layout purpose */
   description: string;
-  /** Optional preview image URL (may be null until generated) */
-  thumbnailUrl: string | null;
-  /** Pre-fills the category field on creation */
-  suggestedCategory: TemplateCategory;
-  /** How many pages this template creates (minimum 2) */
-  defaultPageCount: number;
-  /** Hex color used as thumbnail placeholder */
+  /** Seasonal theme tag for filtering */
+  theme: PageTheme;
+  /** Hex color used as card background in the sidebar grid */
   thumbnailColor: string;
-  /** Ordered array of page layout definitions */
-  pages: TemplatePage[];
+  /** Single Fabric.js canvas JSON object compatible with canvas.loadFromJSON() */
+  fabricJson: Record<string, unknown>;
 }

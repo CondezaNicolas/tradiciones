@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer } from "react";
+import type { PageTemplate } from "@/lib/templates/types";
+import { savePageApi } from "@/lib/canvas/page-store";
+import {
+  setPendingTemplate,
+} from "@/lib/templates/pending-templates";
 
 /* ───────────────────────── Constants ───────────────────────── */
 
@@ -19,7 +24,8 @@ type BookAction =
   | { type: "open" }
   | { type: "close" }
   | { type: "goTo"; spread: number }
-  | { type: "addPages" };
+  | { type: "addPages" }
+  | { type: "addPage" };
 
 interface FlipState {
   phase: "idle" | "ready" | "flipping";
@@ -75,6 +81,7 @@ export interface UseBookFlipReturn {
   goToPrev: () => void;
   onFlipEnd: (e: React.TransitionEvent) => void;
   addPages: () => void;
+  addPageWithTemplate: (template: PageTemplate, editionId: string) => number;
 }
 
 /* ───────────────────────── Hook ────────────────────────────── */
@@ -99,6 +106,8 @@ export function useBookFlip(
           return { ...state, currentSpread: action.spread };
         case "addPages":
           return { ...state, totalPages: Math.min(state.totalPages + 2, maxPages) };
+        case "addPage":
+          return { ...state, totalPages: Math.min(state.totalPages + 1, maxPages) };
       }
     },
     { isOpen: false, currentSpread: 0, totalPages: initialPages },
@@ -178,6 +187,30 @@ export function useBookFlip(
     dispatchBook({ type: "addPages" });
   };
 
+  const addPageWithTemplate = useCallback(
+    (template: PageTemplate, editionId: string): number => {
+      if (totalPages >= maxPages) return -1;
+
+      const newPageNumber = totalPages;
+      dispatchBook({ type: "addPage" });
+
+      const fabricJson = template.fabricJson as Record<string, unknown>;
+
+      // Store in pending cache for immediate canvas access
+      setPendingTemplate(editionId, newPageNumber, fabricJson);
+
+      // Persist to server (fire-and-forget)
+      savePageApi(editionId, newPageNumber, fabricJson).catch(
+        (err: unknown) => {
+          console.error("[use-book-flip] savePageApi failed for template:", err);
+        },
+      );
+
+      return newPageNumber;
+    },
+    [totalPages, maxPages, dispatchBook],
+  );
+
   return {
     /* Book */
     isOpen,
@@ -207,5 +240,6 @@ export function useBookFlip(
     goToPrev,
     onFlipEnd,
     addPages,
+    addPageWithTemplate,
   };
 }

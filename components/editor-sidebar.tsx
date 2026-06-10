@@ -1,18 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { MdTextFields, MdImage, MdLayers } from "react-icons/md";
+import { MdTextFields, MdImage, MdLayers, MdAutoAwesome } from "react-icons/md";
 import EditorSidebarTextTab from "./editor-sidebar-text-tab";
 import EditorSidebarImageTab from "./editor-sidebar-image-tab";
 import EditorSidebarLayersTab from "./editor-sidebar-layers-tab";
+import TemplatesTab from "./editor-sidebar/templates-tab";
+import type { PageTemplate } from "@/lib/templates/types";
 
 /* ────────────────────────── Types ────────────────────────── */
 
-type SidebarTab = "texto" | "imagen" | "capas";
+type SidebarTab = "texto" | "imagen" | "capas" | "plantillas";
+
+interface EditorSidebarProps {
+  editionId?: string;
+  onApplyTemplate?: (template: PageTemplate) => void;
+}
 
 /* ────────────────────────── Sidebar Component ────────────────────────── */
 
-export default function EditorSidebar({ editionId }: { editionId?: string }) {
+export default function EditorSidebar({ editionId, onApplyTemplate }: EditorSidebarProps) {
   const [activeTab, setActiveTab] = useState<SidebarTab>("texto");
 
   const tabs: {
@@ -23,6 +30,7 @@ export default function EditorSidebar({ editionId }: { editionId?: string }) {
     { id: "texto", label: "Texto", icon: MdTextFields },
     { id: "imagen", label: "Imagen", icon: MdImage },
     { id: "capas", label: "Capas", icon: MdLayers },
+    { id: "plantillas", label: "Plantillas", icon: MdAutoAwesome },
   ];
 
   return (
@@ -37,13 +45,13 @@ export default function EditorSidebar({ editionId }: { editionId?: string }) {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 font-label text-[11px] font-medium uppercase tracking-wider transition-all duration-200 ${
+              className={`flex flex-1 items-center justify-center gap-1 rounded-lg px-1 py-2 font-label text-[9px] font-medium uppercase tracking-wider transition-all duration-200 ${
                 isActive
                   ? "bg-surface-container-high text-on-surface"
                   : "text-on-surface-variant/60 hover:bg-surface-container-high hover:text-on-surface-variant"
               }`}
             >
-              <Icon size={16} />
+              <Icon size={14} />
               <span>{tab.label}</span>
             </button>
           );
@@ -55,6 +63,9 @@ export default function EditorSidebar({ editionId }: { editionId?: string }) {
         {activeTab === "texto" && <EditorSidebarTextTab />}
         {activeTab === "imagen" && <EditorSidebarImageTab editionId={editionId} />}
         {activeTab === "capas" && <EditorSidebarLayersTab />}
+        {activeTab === "plantillas" && onApplyTemplate && (
+          <TemplatesTab onApplyTemplate={onApplyTemplate} />
+        )}
       </div>
     </div>
   );

@@ -67,10 +67,8 @@ export function EditionDetailsSection({
               onChange={(e) => onFieldChange("categoria", e.target.value)}
               className="w-full rounded-none border-none bg-surface-container-high py-3 font-label text-sm outline-none focus:ring-0"
             >
-              <option>Cultura</option>
-              <option>Gastronomía</option>
-              <option>Arquitectura</option>
-              <option>Naturaleza</option>
+              <option>Invierno</option>
+              <option>Verano</option>
             </select>
           </div>
 

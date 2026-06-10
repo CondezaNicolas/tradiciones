@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useReducer } from "react";
+import { useState, useReducer, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { CanvasProvider } from "@/components/canvas/canvas-provider";
 import { EditorErrorBoundary } from "@/components/canvas/editor-error-boundary";
 import { useBookFlip } from "@/lib/hooks/use-book-flip";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
+import type { PageTemplate } from "@/lib/templates/types";
 import {
   Book3D,
   BookCover,
@@ -72,9 +73,31 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
     dispatchEditor,
     onFlipEnd,
     addPages,
+    addPageWithTemplate,
   } = useBookFlip();
 
   const isMobile = useIsMobile();
+
+  /* ── MAX_PAGES mirrors use-book-flip constant ── */
+  const MAX_PAGES = 20;
+
+  /* ── Template application handler ── */
+  const handleApplyTemplate = useCallback(
+    (template: PageTemplate) => {
+      if (!edition || totalPages >= MAX_PAGES) return;
+
+      const newPageNumber = addPageWithTemplate(template, edition.id);
+      if (newPageNumber < 0) return;
+
+      // Navigate to the spread containing the new page
+      const targetSpreadIndex = Math.floor(newPageNumber / 2);
+      if (targetSpreadIndex !== currentSpread) {
+        const direction = targetSpreadIndex > currentSpread ? "next" : "prev";
+        dispatchFlip({ type: "start", direction, target: targetSpreadIndex });
+      }
+    },
+    [edition, totalPages, addPageWithTemplate, currentSpread, dispatchFlip],
+  );
 
   /* ── Edition-specific save/publish state ── */
   const [savingStatus, setSavingStatus] = useState<"idle" | "saving">("idle");
@@ -203,7 +226,7 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
       {/* ── Book area + Sidebar ── */}
       <CanvasProvider>
         <div className="flex items-start justify-center px-12 py-20 max-[980px]:px-5">
-          {tieneDatos && isOpen && isEditing && !isMobile && <EditorSidebar editionId={edition!.id} />}
+          {tieneDatos && isOpen && isEditing && !isMobile && <EditorSidebar editionId={edition!.id} onApplyTemplate={handleApplyTemplate} />}
 
           <EditorErrorBoundary>
             <div className="flex flex-col items-center">

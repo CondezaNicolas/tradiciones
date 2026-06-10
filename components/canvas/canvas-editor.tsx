@@ -3,6 +3,7 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useFabric } from "@/lib/canvas/use-fabric";
 import * as pageStore from "@/lib/canvas/page-store";
+import { getPendingTemplate, clearPendingTemplate } from "@/lib/templates/pending-templates";
 import { useCanvasContext } from "@/components/canvas/canvas-provider";
 
 interface CanvasEditorProps {
@@ -114,6 +115,20 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
     // Load existing page state from store (one-time per mount)
     if (!hasLoadedRef.current) {
       hasLoadedRef.current = true;
+
+      // Check pending template cache first (template just applied)
+      if (editionId) {
+        const pendingJson = getPendingTemplate(editionId, pageIndex);
+        if (pendingJson) {
+          fabricCanvas.loadFromJSON(pendingJson).then(() => {
+            clearPendingTemplate(editionId, pageIndex);
+          }).catch(() => {
+            // Silently ignore load errors — canvas starts fresh
+          });
+          return;
+        }
+      }
+
       const loadPromise = editionId
         ? pageStore.loadPageApi(editionId, pageIndex)
         : pageStore.loadPage(pageIndex);
