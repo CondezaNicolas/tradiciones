@@ -25,6 +25,13 @@ function getSupabaseAdminClient() {
 }
 
 async function uploadToLocal(file: File) {
+  if (process.env.VERCEL) {
+    throw new Error(
+      "El almacenamiento local no funciona en Vercel (filesystem efímero). " +
+        "Configura STORAGE_PROVIDER=supabase con credenciales válidas, o usa Vercel Blob.",
+    );
+  }
+
   const buffer = Buffer.from(await file.arrayBuffer());
   const uniqueName = `${nanoid()}-${sanitizeFilename(file.name)}`;
   const uploadsDir = join(process.cwd(), "public", "uploads");
