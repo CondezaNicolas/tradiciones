@@ -191,7 +191,7 @@ export function useBookFlip(
     (template: PageTemplate, editionId: string): number => {
       if (totalPages >= maxPages) return -1;
 
-      const newPageNumber = totalPages;
+      const newPageNumber = totalPages + 1;
       dispatchBook({ type: "addPage" });
 
       const fabricJson = template.fabricJson as Record<string, unknown>;

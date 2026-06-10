@@ -90,7 +90,7 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
       if (newPageNumber < 0) return;
 
       // Navigate to the spread containing the new page
-      const targetSpreadIndex = Math.floor(newPageNumber / 2);
+      const targetSpreadIndex = Math.floor((newPageNumber - 1) / 2);
       if (targetSpreadIndex !== currentSpread) {
         const direction = targetSpreadIndex > currentSpread ? "next" : "prev";
         dispatchFlip({ type: "start", direction, target: targetSpreadIndex });
