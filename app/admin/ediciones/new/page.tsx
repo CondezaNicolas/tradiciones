@@ -63,16 +63,18 @@ export default function NuevaEdicionPage() {
     (template: PageTemplate) => {
       if (totalPages >= MAX_PAGES) return;
 
-      const newPageNumber = addPageWithTemplate(template, tempEditionId);
-      if (newPageNumber < 0) return;
+      const newPageIndex = addPageWithTemplate(template, tempEditionId);
+      if (newPageIndex < 0) return;
 
-      const targetSpreadIndex = Math.floor((newPageNumber - 1) / 2);
+      const targetSpreadIndex = Math.floor(newPageIndex / 2);
       if (targetSpreadIndex !== currentSpread) {
         const direction = targetSpreadIndex > currentSpread ? "next" : "prev";
         dispatchFlip({ type: "start", direction, target: targetSpreadIndex });
       }
+
+      dispatchEditor({ type: "edit", pageIndex: newPageIndex });
     },
-    [totalPages, addPageWithTemplate, tempEditionId, currentSpread, dispatchFlip],
+    [totalPages, addPageWithTemplate, tempEditionId, currentSpread, dispatchFlip, dispatchEditor],
   );
 
   const isMobile = useIsMobile();

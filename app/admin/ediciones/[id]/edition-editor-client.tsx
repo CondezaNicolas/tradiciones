@@ -86,17 +86,18 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
     (template: PageTemplate) => {
       if (!edition || totalPages >= MAX_PAGES) return;
 
-      const newPageNumber = addPageWithTemplate(template, edition.id);
-      if (newPageNumber < 0) return;
+      const newPageIndex = addPageWithTemplate(template, edition.id);
+      if (newPageIndex < 0) return;
 
-      // Navigate to the spread containing the new page
-      const targetSpreadIndex = Math.floor((newPageNumber - 1) / 2);
+      const targetSpreadIndex = Math.floor(newPageIndex / 2);
       if (targetSpreadIndex !== currentSpread) {
         const direction = targetSpreadIndex > currentSpread ? "next" : "prev";
         dispatchFlip({ type: "start", direction, target: targetSpreadIndex });
       }
+
+      dispatchEditor({ type: "edit", pageIndex: newPageIndex });
     },
-    [edition, totalPages, addPageWithTemplate, currentSpread, dispatchFlip],
+    [edition, totalPages, addPageWithTemplate, currentSpread, dispatchFlip, dispatchEditor],
   );
 
   /* ── Edition-specific save/publish state ── */

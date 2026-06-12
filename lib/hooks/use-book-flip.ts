@@ -191,22 +191,23 @@ export function useBookFlip(
     (template: PageTemplate, editionId: string): number => {
       if (totalPages >= maxPages) return -1;
 
+      const newPageIndex = totalPages;
       const newPageNumber = totalPages + 1;
       dispatchBook({ type: "addPage" });
 
       const fabricJson = template.fabricJson as Record<string, unknown>;
 
-      // Store in pending cache for immediate canvas access
-      setPendingTemplate(editionId, newPageNumber, fabricJson);
+      // Store in pending cache using 0-based pageIndex for canvas lookup
+      setPendingTemplate(editionId, newPageIndex, fabricJson);
 
-      // Persist to server (fire-and-forget)
+      // Persist to server using 1-based pageNumber (fire-and-forget)
       savePageApi(editionId, newPageNumber, fabricJson).catch(
         (err: unknown) => {
           console.error("[use-book-flip] savePageApi failed for template:", err);
         },
       );
 
-      return newPageNumber;
+      return newPageIndex;
     },
     [totalPages, maxPages, dispatchBook],
   );

@@ -8,18 +8,21 @@ interface ReadOnlyPageProps {
   pageIndex: number;
   onEdit: () => void;
   thumbnail?: string | null;
+  editionId?: string;
 }
 
-/** Read-only page preview with thumbnail and "Editar página" button */
-export function ReadOnlyPage({ pageIndex, onEdit, thumbnail: thumbnailProp }: ReadOnlyPageProps) {
+export function ReadOnlyPage({ pageIndex, onEdit, thumbnail: thumbnailProp, editionId }: ReadOnlyPageProps) {
   const [loadedThumbnail, setLoadedThumbnail] = useState<string | null>(null);
   const thumbnail = thumbnailProp ?? loadedThumbnail;
 
   useEffect(() => {
     if (thumbnailProp) return;
     let cancelled = false;
-    pageStore
-      .loadPage(pageIndex)
+    const loadPromise = editionId
+      ? pageStore.loadPageApi(editionId, pageIndex)
+      : pageStore.loadPage(pageIndex);
+
+    loadPromise
       .then((data) => {
         if (!cancelled && data?.thumbnail) {
           setLoadedThumbnail(data.thumbnail);
@@ -29,7 +32,7 @@ export function ReadOnlyPage({ pageIndex, onEdit, thumbnail: thumbnailProp }: Re
     return () => {
       cancelled = true;
     };
-  }, [pageIndex, thumbnailProp]);
+  }, [pageIndex, thumbnailProp, editionId]);
 
   return (
     <div

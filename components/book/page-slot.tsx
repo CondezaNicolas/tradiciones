@@ -69,6 +69,7 @@ export function PageSlot({
       pageIndex={pageIndex}
       onEdit={() => onEdit(pageIndex)}
       thumbnail={thumbnails[pageIndex]}
+      editionId={editionId}
     />
   );
 }
