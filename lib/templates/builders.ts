@@ -201,7 +201,7 @@ export function imagePlaceholder(
   top: number,
   width: number,
   height: number,
-  label = "Imagen",
+  _label = "Imagen",
 ) {
   return {
     type: "Rect",
@@ -217,6 +217,8 @@ export function imagePlaceholder(
     ry: 8,
     originX: "left",
     originY: "top",
+    selectable: false,
+    evented: false,
   };
 }
 
@@ -254,6 +256,8 @@ export function imageFrame(
     ry: borderRadius,
     originX: "left",
     originY: "top",
+    selectable: false,
+    evented: false,
   };
 }
 
@@ -273,6 +277,8 @@ export function dividerLine(left: number, top: number, width: number) {
     ry: 0,
     originX: "left",
     originY: "top",
+    selectable: false,
+    evented: false,
   };
 }
 
@@ -298,6 +304,8 @@ export function solidBackground(
     ry: 0,
     originX: "left",
     originY: "top",
+    selectable: false,
+    evented: false,
   };
 }
 
@@ -334,6 +342,8 @@ export function gradientBackground(
     ry: 0,
     originX: "left",
     originY: "top",
+    selectable: false,
+    evented: false,
   };
 }
 
@@ -362,6 +372,8 @@ export function decorativeShape(
       opacity,
       originX: "left",
       originY: "top",
+      selectable: false,
+      evented: false,
     };
   }
 
@@ -385,10 +397,11 @@ export function decorativeShape(
       ],
       originX: "left",
       originY: "top",
+      selectable: false,
+      evented: false,
     };
   }
 
-  // triangle
   return {
     type: "Polygon",
     version: "7.2.0",
@@ -407,6 +420,8 @@ export function decorativeShape(
     ],
     originX: "left",
     originY: "top",
+    selectable: false,
+    evented: false,
   };
 }
 
@@ -421,7 +436,6 @@ export function ornamentalDivider(
   const midX = left + width / 2 - diamondSize / 2;
 
   return [
-    // left line
     {
       type: "Rect",
       version: "7.2.0",
@@ -436,8 +450,9 @@ export function ornamentalDivider(
       ry: 0,
       originX: "left",
       originY: "top",
+      selectable: false,
+      evented: false,
     },
-    // center diamond
     {
       type: "Polygon",
       version: "7.2.0",
@@ -456,8 +471,9 @@ export function ornamentalDivider(
       ],
       originX: "left",
       originY: "top",
+      selectable: false,
+      evented: false,
     },
-    // right line
     {
       type: "Rect",
       version: "7.2.0",
@@ -472,6 +488,8 @@ export function ornamentalDivider(
       ry: 0,
       originX: "left",
       originY: "top",
+      selectable: false,
+      evented: false,
     },
   ];
 }
