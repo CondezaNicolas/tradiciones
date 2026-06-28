@@ -2,6 +2,7 @@
 
 import { MaterialIcon, MATERIAL_ICONS } from "./material-icon";
 import { StatusToggle } from "@/app/admin/_components/status-toggle";
+import { PAGE_TEMPLATES } from "@/lib/templates/registry";
 
 const MESES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -10,7 +11,7 @@ const MESES = [
 
 const ANIOS = ["2025", "2026"] as const;
 
-type FormField = "titulo" | "categoria" | "mes" | "anio" | "resumen";
+type FormField = "titulo" | "categoria" | "mes" | "anio" | "resumen" | "plantillaInicial";
 
 interface EditionDetailsSectionProps {
   titulo: string;
@@ -18,6 +19,7 @@ interface EditionDetailsSectionProps {
   mes: string;
   anio: string;
   resumen: string;
+  plantillaInicial: string;
   isSubmitting: boolean;
   canSubmit: boolean;
   onFieldChange: (field: FormField, value: string) => void;
@@ -30,6 +32,7 @@ export function EditionDetailsSection({
   mes,
   anio,
   resumen,
+  plantillaInicial,
   isSubmitting,
   canSubmit,
   onFieldChange,
@@ -112,6 +115,28 @@ export function EditionDetailsSection({
             placeholder="Breve descripción del corazón de esta edición..."
             className="w-full resize-none border-none bg-surface-container-high p-4 font-body text-base leading-relaxed placeholder:text-on-surface-variant/30 focus:outline-none"
           />
+        </div>
+
+        <div>
+          <label htmlFor="create-plantilla" className="mb-2 block font-label text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant">
+            PLANTILLA INICIAL
+          </label>
+          <select
+            id="create-plantilla"
+            value={plantillaInicial}
+            onChange={(e) => onFieldChange("plantillaInicial", e.target.value)}
+            className="w-full rounded-none border-none bg-surface-container-high py-3 font-label text-sm outline-none focus:ring-0"
+          >
+            <option value="">Sin plantilla</option>
+            {PAGE_TEMPLATES.map((template) => (
+              <option key={template.id} value={template.id}>
+                {template.name} - {template.description}
+              </option>
+            ))}
+          </select>
+          <p className="mt-2 font-label text-[11px] text-on-surface-variant/60">
+            Crea la primera página con espacios ya listos para texto e imagen.
+          </p>
         </div>
 
         <button

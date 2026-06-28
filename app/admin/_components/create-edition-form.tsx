@@ -3,13 +3,15 @@
 import { useRef, useReducer } from "react";
 import { useRouter } from "next/navigation";
 import { compressImage } from "@/lib/image-utils";
+import { getTemplateById } from "@/lib/templates/registry";
 import { EditionFormHeader } from "./edition-form-header";
 import { EditionDetailsSection } from "./edition-details-section";
 import { CoverImageSection } from "./cover-image-section";
+import { savePageApi } from "@/lib/canvas/page-store";
 
 /* ─────────────────────── Reducer ─────────────────────── */
 
-type FormField = "titulo" | "categoria" | "mes" | "anio" | "resumen";
+type FormField = "titulo" | "categoria" | "mes" | "anio" | "resumen" | "plantillaInicial";
 
 interface FormState {
   titulo: string;
@@ -17,6 +19,7 @@ interface FormState {
   mes: string;
   anio: string;
   resumen: string;
+  plantillaInicial: string;
   imagenPortada: string | null;
   isSubmitting: boolean;
   error: string | null;
@@ -52,6 +55,7 @@ const INITIAL_STATE: FormState = {
   mes: MESES[new Date().getMonth()],
   anio: new Date().getFullYear().toString(),
   resumen: "",
+  plantillaInicial: "",
   imagenPortada: null,
   isSubmitting: false,
   error: null,
@@ -115,6 +119,13 @@ export function CreateForm({ onCancel }: { onCancel: () => void }) {
 
       const edition = await response.json();
 
+      if (form.plantillaInicial) {
+        const template = getTemplateById(form.plantillaInicial);
+        if (template) {
+          await savePageApi(edition.id, 0, template.fabricJson);
+        }
+      }
+
       if (coverFileRef.current) {
         const compressed = await compressImage(coverFileRef.current);
         const uploadFormData = new FormData();
@@ -160,6 +171,7 @@ export function CreateForm({ onCancel }: { onCancel: () => void }) {
             mes={form.mes}
             anio={form.anio}
             resumen={form.resumen}
+            plantillaInicial={form.plantillaInicial}
             isSubmitting={form.isSubmitting}
             canSubmit={formularioCompleto}
             onFieldChange={handleFieldChange}
