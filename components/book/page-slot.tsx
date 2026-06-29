@@ -19,6 +19,7 @@ const CanvasEditor = dynamic(() => import("@/components/canvas/canvas-editor"), 
 interface PageSlotProps {
   pageIndex: number;
   editingPageIndex: number | null;
+  editorInstanceKey?: number;
   isMobile: boolean;
   pageW: number;
   pageH: number;
@@ -35,6 +36,7 @@ interface PageSlotProps {
 export function PageSlot({
   pageIndex,
   editingPageIndex,
+  editorInstanceKey = 0,
   isMobile,
   pageW,
   pageH,
@@ -54,7 +56,7 @@ export function PageSlot({
   if (pageIndex === editingPageIndex) {
     return (
       <CanvasEditor
-        key={`page-${pageIndex}`}
+        key={`page-${pageIndex}-${editorInstanceKey}`}
         pageIndex={pageIndex}
         width={pageW}
         height={pageH}

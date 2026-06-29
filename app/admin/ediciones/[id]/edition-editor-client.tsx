@@ -46,6 +46,7 @@ function editionReducer(_state: EditionState, action: EditionState): EditionStat
 
 export function EditionEditorClient({ initialEdition }: { initialEdition: EditionData }) {
   const [state, dispatch] = useReducer(editionReducer, { status: "loaded", edition: initialEdition } as EditionState);
+  const [editorInstanceKey, bumpEditorInstanceKey] = useReducer((value: number) => value + 1, 0);
 
   const edition = state.status === "loaded" ? state.edition : null;
   const loadError = state.status === "error" ? state.error : null;
@@ -94,10 +95,7 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
         savePageApi(edition.id, editingPageIndex, fabricJson).catch((err: unknown) => {
           console.error("[edition-editor] savePageApi failed for template:", err);
         });
-        dispatchEditor({ type: "edit", pageIndex: null });
-        requestAnimationFrame(() => {
-          dispatchEditor({ type: "edit", pageIndex: editingPageIndex });
-        });
+        bumpEditorInstanceKey();
         return;
       }
 
@@ -272,6 +270,7 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
                   currentSpread={currentSpread}
                   isMobile={isMobile}
                   editingPageIndex={editingPageIndex}
+                  editorInstanceKey={editorInstanceKey}
                   editionId={edition!.id}
                   thumbnails={thumbnails}
                   onThumbnailUpdate={(pageIndex, url) =>

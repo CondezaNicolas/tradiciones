@@ -27,6 +27,7 @@ interface Book3DProps {
 
   /** Editor */
   editingPageIndex: number | null;
+  editorInstanceKey?: number;
   editionId?: string;
   thumbnails: Record<number, string>;
   onThumbnailUpdate: (pageIndex: number, url: string) => void;
@@ -66,6 +67,7 @@ export function Book3D({
   currentSpread,
   isMobile,
   editingPageIndex,
+  editorInstanceKey = 0,
   editionId,
   thumbnails,
   onThumbnailUpdate,
@@ -78,6 +80,7 @@ export function Book3D({
   const slotProps = (pageIndex: number) => ({
     pageIndex,
     editingPageIndex,
+    editorInstanceKey,
     isMobile,
     pageW,
     pageH,
