@@ -122,7 +122,7 @@ export function CreateForm({ onCancel }: { onCancel: () => void }) {
       if (form.plantillaInicial) {
         const template = getTemplateById(form.plantillaInicial);
         if (template) {
-          await savePageApi(edition.id, 0, template.fabricJson);
+          await savePageApi(edition.id, 2, template.fabricJson);
         }
       }
 
