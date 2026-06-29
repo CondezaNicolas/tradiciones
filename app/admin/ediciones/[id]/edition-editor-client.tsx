@@ -4,9 +4,11 @@ import { useState, useReducer, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { CanvasProvider } from "@/components/canvas/canvas-provider";
 import { EditorErrorBoundary } from "@/components/canvas/editor-error-boundary";
+import { savePageApi } from "@/lib/canvas/page-store";
 import { useBookFlip } from "@/lib/hooks/use-book-flip";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
 import type { PageTemplate } from "@/lib/templates/types";
+import { setPendingTemplate } from "@/lib/templates/pending-templates";
 import {
   Book3D,
   BookCover,
@@ -84,7 +86,22 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
   /* ── Template application handler ── */
   const handleApplyTemplate = useCallback(
     (template: PageTemplate) => {
-      if (!edition || totalPages >= MAX_PAGES) return;
+      if (!edition) return;
+
+      if (editingPageIndex !== null) {
+        const fabricJson = template.fabricJson as Record<string, unknown>;
+        setPendingTemplate(edition.id, editingPageIndex, fabricJson);
+        savePageApi(edition.id, editingPageIndex, fabricJson).catch((err: unknown) => {
+          console.error("[edition-editor] savePageApi failed for template:", err);
+        });
+        dispatchEditor({ type: "edit", pageIndex: null });
+        requestAnimationFrame(() => {
+          dispatchEditor({ type: "edit", pageIndex: editingPageIndex });
+        });
+        return;
+      }
+
+      if (totalPages >= MAX_PAGES) return;
 
       const newPageIndex = addPageWithTemplate(template, edition.id);
       if (newPageIndex < 0) return;
@@ -97,7 +114,7 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
 
       dispatchEditor({ type: "edit", pageIndex: newPageIndex });
     },
-    [edition, totalPages, addPageWithTemplate, currentSpread, dispatchFlip, dispatchEditor],
+    [edition, totalPages, addPageWithTemplate, currentSpread, dispatchFlip, dispatchEditor, editingPageIndex],
   );
 
   /* ── Edition-specific save/publish state ── */
