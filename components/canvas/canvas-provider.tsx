@@ -125,7 +125,11 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
       const { FabricImage } = await import("fabric");
 
-      const img = await FabricImage.fromURL(dataUrl);
+      // crossOrigin is required for Supabase-hosted images — without it the
+      // canvas is tainted and thumbnail generation (toDataURL) throws.
+      const img = await FabricImage.fromURL(dataUrl, {
+        crossOrigin: "anonymous",
+      });
 
       // Fit the image to the page size immediately — as large as possible
       // without cropping, no manual resizing needed or allowed.

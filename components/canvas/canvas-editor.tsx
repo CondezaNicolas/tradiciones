@@ -3,6 +3,7 @@
 import { useEffect, useReducer, useRef } from "react";
 import { useFabric } from "@/lib/canvas/use-fabric";
 import * as pageStore from "@/lib/canvas/page-store";
+import { withAnonymousImages } from "@/lib/canvas/fabric-json";
 import { getPendingTemplate, clearPendingTemplate } from "@/lib/templates/pending-templates";
 import { useCanvasContext } from "@/components/canvas/canvas-provider";
 
@@ -120,7 +121,7 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
       if (editionId) {
         const pendingJson = getPendingTemplate(editionId, pageIndex);
         if (pendingJson) {
-          fabricCanvas.loadFromJSON(pendingJson).then(() => {
+          fabricCanvas.loadFromJSON(withAnonymousImages(pendingJson)).then(() => {
             clearPendingTemplate(editionId, pageIndex);
           }).catch(() => {
             // Silently ignore load errors — canvas starts fresh
@@ -136,7 +137,7 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
       loadPromise
         .then((existing) => {
           if (existing?.fabricJSON) {
-            fabricCanvas.loadFromJSON(existing.fabricJSON).catch(() => {
+            fabricCanvas.loadFromJSON(withAnonymousImages(existing.fabricJSON)).catch(() => {
               // Silently ignore load errors — canvas starts fresh
             });
           }
