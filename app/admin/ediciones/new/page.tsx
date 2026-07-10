@@ -1,13 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { nanoid } from "nanoid";
 import { CanvasProvider } from "@/components/canvas/canvas-provider";
 import { EditorErrorBoundary } from "@/components/canvas/editor-error-boundary";
 import { useBookFlip } from "@/lib/hooks/use-book-flip";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
-import type { PageTemplate } from "@/lib/templates/types";
 import {
   Book3D,
   BookCover,
@@ -35,8 +34,6 @@ export default function NuevaEdicionPage() {
   const [data] = useState<EdicionFormData | null>(null);
   const [tempEditionId] = useState(() => nanoid());
 
-  const MAX_PAGES = 20;
-
   /* ── Shared book hooks ── */
   const {
     isOpen,
@@ -56,26 +53,7 @@ export default function NuevaEdicionPage() {
     dispatchEditor,
     onFlipEnd,
     addPages,
-    addPageWithTemplate,
   } = useBookFlip();
-
-  const handleApplyTemplate = useCallback(
-    (template: PageTemplate) => {
-      if (totalPages >= MAX_PAGES) return;
-
-      const newPageIndex = addPageWithTemplate(template, tempEditionId);
-      if (newPageIndex < 0) return;
-
-      const targetSpreadIndex = Math.floor(newPageIndex / 2);
-      if (targetSpreadIndex !== currentSpread) {
-        const direction = targetSpreadIndex > currentSpread ? "next" : "prev";
-        dispatchFlip({ type: "start", direction, target: targetSpreadIndex });
-      }
-
-      dispatchEditor({ type: "edit", pageIndex: newPageIndex });
-    },
-    [totalPages, addPageWithTemplate, tempEditionId, currentSpread, dispatchFlip, dispatchEditor],
-  );
 
   const isMobile = useIsMobile();
 
@@ -142,7 +120,7 @@ export default function NuevaEdicionPage() {
       <CanvasProvider>
         <div className="flex items-start justify-center px-12 py-20 max-[980px]:px-5">
           {/* Sidebar — only when a page is being edited */}
-          {tieneDatos && isOpen && isEditing && !isMobile && <EditorSidebar editionId={tempEditionId} onApplyTemplate={handleApplyTemplate} />}
+          {tieneDatos && isOpen && isEditing && !isMobile && <EditorSidebar editionId={tempEditionId} />}
 
           {/* Book */}
           <EditorErrorBoundary>

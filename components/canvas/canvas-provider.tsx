@@ -11,34 +11,20 @@ import {
 } from "react";
 import type { Canvas, FabricObject } from "fabric";
 
-/* ────────────────────────── Types ────────────────────────── */
-
-export interface TextPreset {
-  text?: string;
-  fontFamily?: string;
-  fontSize?: number;
-  fontWeight?: string | number;
-}
-
 /* ────────────────────────── Context shape ────────────────────────── */
 
 interface CanvasContextValue {
-  addText: (preset?: TextPreset) => void;
   addImage: (dataUrl: string) => void;
   deleteSelected: () => void;
   bringToFront: () => void;
   sendToBack: () => void;
   duplicateSelected: () => void;
   updateSelectedProperty: (props: Record<string, unknown>) => void;
-  getActiveCanvasObjects: () => FabricObject[];
-  selectObject: (obj: FabricObject) => void;
-  moveObject: (obj: FabricObject, direction: "forward" | "backward") => void;
   selectedElement: FabricObject | null;
   canvasReady: boolean;
   registerCanvas: (index: number, canvas: Canvas) => void;
   unregisterCanvas: (index: number) => void;
   activeCanvasIndex: number | null;
-  layersVersion: number;
 }
 
 const CanvasContext = createContext<CanvasContextValue | null>(null);
@@ -55,13 +41,10 @@ export function useCanvasContext(): CanvasContextValue {
 
 /* ────────────────────────── Provider ────────────────────────── */
 
-const ON_SURFACE_COLOR = "#1D1B20";
-
 export function CanvasProvider({ children }: { children: ReactNode }) {
   const canvasesRef = useRef<Map<number, Canvas>>(new Map());
   const [activeCanvasIndex, setActiveCanvasIndex] = useState<number | null>(null);
   const [selectedElement, setSelectedElement] = useState<FabricObject | null>(null);
-  const [layersVersion, setLayersVersion] = useState(0);
 
   // Ref so event handlers always see the latest activeCanvasIndex
   const activeIndexRef = useRef<number | null>(null);
@@ -76,10 +59,6 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const idx = activeIndexRef.current;
     if (idx === null) return null;
     return canvasesRef.current.get(idx) ?? null;
-  }, []);
-
-  const bumpLayers = useCallback(() => {
-    setLayersVersion((v) => v + 1);
   }, []);
 
   /* ── Register / unregister ── */
@@ -137,32 +116,6 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  /* ── Tool: add text ── */
-
-  const addText = useCallback(async (preset?: TextPreset) => {
-    const canvas = getActiveCanvas();
-    if (!canvas) return;
-
-    const { Textbox } = await import("fabric");
-
-    const text = new Textbox(preset?.text ?? "Escribe aquí...", {
-      left: canvas.getWidth() / 2,
-      top: canvas.getHeight() / 2,
-      width: 200,
-      fontFamily: preset?.fontFamily ?? "Manrope",
-      fontSize: preset?.fontSize ?? 24,
-      fontWeight: preset?.fontWeight ?? "normal",
-      fill: ON_SURFACE_COLOR,
-      originX: "center",
-      originY: "center",
-    });
-
-    canvas.add(text);
-    canvas.setActiveObject(text);
-    canvas.requestRenderAll();
-    bumpLayers();
-  }, [getActiveCanvas, bumpLayers]);
-
   /* ── Tool: add image ── */
 
   const addImage = useCallback(
@@ -174,28 +127,31 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
       const img = await FabricImage.fromURL(dataUrl);
 
-      // Scale to fit within 80% of canvas dimensions
-      const maxW = canvas.getWidth() * 0.8;
-      const maxH = canvas.getHeight() * 0.8;
-      const origW = img.width ?? maxW;
-      const origH = img.height ?? maxH;
-      const scale = Math.min(maxW / origW, maxH / origH, 1);
+      // Fit the image to the page size immediately — as large as possible
+      // without cropping, no manual resizing needed or allowed.
+      const pageW = canvas.getWidth();
+      const pageH = canvas.getHeight();
+      const origW = img.width || pageW;
+      const origH = img.height || pageH;
+      const scale = Math.min(pageW / origW, pageH / origH);
 
       img.set({
-        left: canvas.getWidth() / 2,
-        top: canvas.getHeight() / 2,
+        left: pageW / 2,
+        top: pageH / 2,
         scaleX: scale,
         scaleY: scale,
         originX: "center",
         originY: "center",
+        hasControls: false,
+        lockScalingX: true,
+        lockScalingY: true,
       });
 
       canvas.add(img);
       canvas.setActiveObject(img);
       canvas.requestRenderAll();
-      bumpLayers();
     },
-    [getActiveCanvas, bumpLayers],
+    [getActiveCanvas],
   );
 
   /* ── Tool: delete selected ── */
@@ -211,8 +167,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     canvas.discardActiveObject();
     canvas.requestRenderAll();
     setSelectedElement(null);
-    bumpLayers();
-  }, [getActiveCanvas, bumpLayers]);
+  }, [getActiveCanvas]);
 
   /* ── Tool: bring to front ── */
 
@@ -226,8 +181,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     canvas.bringObjectToFront(active);
     canvas.requestRenderAll();
     canvas.fire("object:modified" as never, { target: active } as never);
-    bumpLayers();
-  }, [getActiveCanvas, bumpLayers]);
+  }, [getActiveCanvas]);
 
   /* ── Tool: send to back ── */
 
@@ -241,8 +195,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     canvas.sendObjectToBack(active);
     canvas.requestRenderAll();
     canvas.fire("object:modified" as never, { target: active } as never);
-    bumpLayers();
-  }, [getActiveCanvas, bumpLayers]);
+  }, [getActiveCanvas]);
 
   /* ── Tool: duplicate selected ── */
 
@@ -263,8 +216,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     canvas.setActiveObject(clone);
     canvas.requestRenderAll();
     setSelectedElement(clone);
-    bumpLayers();
-  }, [getActiveCanvas, bumpLayers]);
+  }, [getActiveCanvas]);
 
   /* ── Tool: update selected property ── */
 
@@ -283,44 +235,6 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     [getActiveCanvas],
   );
 
-  /* ── Tool: get active canvas objects ── */
-
-  const getActiveCanvasObjects = useCallback((): FabricObject[] => {
-    const canvas = getActiveCanvas();
-    if (!canvas) return [];
-    return canvas.getObjects();
-  }, [getActiveCanvas]);
-
-  /* ── Tool: select specific object ── */
-
-  const selectObject = useCallback((obj: FabricObject) => {
-    const canvas = getActiveCanvas();
-    if (!canvas) return;
-
-    canvas.setActiveObject(obj);
-    canvas.requestRenderAll();
-    setSelectedElement(obj);
-  }, [getActiveCanvas]);
-
-  /* ── Tool: move object forward/backward by one step ── */
-
-  const moveObject = useCallback(
-    (obj: FabricObject, direction: "forward" | "backward") => {
-      const canvas = getActiveCanvas();
-      if (!canvas) return;
-
-      if (direction === "forward") {
-        canvas.bringObjectForward(obj);
-      } else {
-        canvas.sendObjectBackwards(obj);
-      }
-      canvas.requestRenderAll();
-      canvas.fire("object:modified" as never, { target: obj } as never);
-      bumpLayers();
-    },
-    [getActiveCanvas, bumpLayers],
-  );
-
   /* ── Computed ── */
 
   const canvasReady = canvasesRef.current.size > 0;
@@ -330,22 +244,17 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   return (
     <CanvasContext.Provider
       value={{
-        addText,
         addImage,
         deleteSelected,
         bringToFront,
         sendToBack,
         duplicateSelected,
         updateSelectedProperty,
-        getActiveCanvasObjects,
-        selectObject,
-        moveObject,
         selectedElement,
         canvasReady,
         registerCanvas,
         unregisterCanvas,
         activeCanvasIndex,
-        layersVersion,
       }}
     >
       {children}

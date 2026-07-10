@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useReducer, useCallback } from "react";
+import { useState, useReducer } from "react";
 import dynamic from "next/dynamic";
 import { CanvasProvider } from "@/components/canvas/canvas-provider";
 import { EditorErrorBoundary } from "@/components/canvas/editor-error-boundary";
-import { savePageApi } from "@/lib/canvas/page-store";
 import { useBookFlip } from "@/lib/hooks/use-book-flip";
 import { useIsMobile } from "@/lib/hooks/use-is-mobile";
-import type { PageTemplate } from "@/lib/templates/types";
-import { setPendingTemplate } from "@/lib/templates/pending-templates";
 import {
   Book3D,
   BookCover,
@@ -46,7 +43,6 @@ function editionReducer(_state: EditionState, action: EditionState): EditionStat
 
 export function EditionEditorClient({ initialEdition }: { initialEdition: EditionData }) {
   const [state, dispatch] = useReducer(editionReducer, { status: "loaded", edition: initialEdition } as EditionState);
-  const [editorInstanceKey, bumpEditorInstanceKey] = useReducer((value: number) => value + 1, 0);
 
   const edition = state.status === "loaded" ? state.edition : null;
   const loadError = state.status === "error" ? state.error : null;
@@ -76,44 +72,9 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
     dispatchEditor,
     onFlipEnd,
     addPages,
-    addPageWithTemplate,
   } = useBookFlip();
 
   const isMobile = useIsMobile();
-
-  /* ── MAX_PAGES mirrors use-book-flip constant ── */
-  const MAX_PAGES = 20;
-
-  /* ── Template application handler ── */
-  const handleApplyTemplate = useCallback(
-    (template: PageTemplate) => {
-      if (!edition) return;
-
-      if (editingPageIndex !== null) {
-        const fabricJson = template.fabricJson as Record<string, unknown>;
-        setPendingTemplate(edition.id, editingPageIndex, fabricJson);
-        savePageApi(edition.id, editingPageIndex, fabricJson).catch((err: unknown) => {
-          console.error("[edition-editor] savePageApi failed for template:", err);
-        });
-        bumpEditorInstanceKey();
-        return;
-      }
-
-      if (totalPages >= MAX_PAGES) return;
-
-      const newPageIndex = addPageWithTemplate(template, edition.id);
-      if (newPageIndex < 0) return;
-
-      const targetSpreadIndex = Math.floor(newPageIndex / 2);
-      if (targetSpreadIndex !== currentSpread) {
-        const direction = targetSpreadIndex > currentSpread ? "next" : "prev";
-        dispatchFlip({ type: "start", direction, target: targetSpreadIndex });
-      }
-
-      dispatchEditor({ type: "edit", pageIndex: newPageIndex });
-    },
-    [edition, totalPages, addPageWithTemplate, currentSpread, dispatchFlip, dispatchEditor, editingPageIndex],
-  );
 
   /* ── Edition-specific save/publish state ── */
   const [savingStatus, setSavingStatus] = useState<"idle" | "saving">("idle");
@@ -242,7 +203,7 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
       {/* ── Book area + Sidebar ── */}
       <CanvasProvider>
         <div className="flex items-start justify-center px-12 py-20 max-[980px]:px-5">
-          {tieneDatos && isOpen && isEditing && !isMobile && <EditorSidebar editionId={edition!.id} onApplyTemplate={handleApplyTemplate} />}
+          {tieneDatos && isOpen && isEditing && !isMobile && <EditorSidebar editionId={edition!.id} />}
 
           <EditorErrorBoundary>
             <div className="flex flex-col items-center">
@@ -270,7 +231,6 @@ export function EditionEditorClient({ initialEdition }: { initialEdition: Editio
                   currentSpread={currentSpread}
                   isMobile={isMobile}
                   editingPageIndex={editingPageIndex}
-                  editorInstanceKey={editorInstanceKey}
                   editionId={edition!.id}
                   thumbnails={thumbnails}
                   onThumbnailUpdate={(pageIndex, url) =>
