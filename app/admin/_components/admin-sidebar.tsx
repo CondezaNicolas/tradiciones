@@ -5,14 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import type { IconType } from "react-icons";
-import {
-  MdAdd,
-  MdArticle,
-  MdAutoStories,
-  MdDashboard,
-  MdLogout,
-  MdSettings,
-} from "react-icons/md";
+import { MdAdd, MdAutoStories, MdLogout, MdSettings } from "react-icons/md";
 
 import { SiteBrand } from "@/components/site-brand";
 
@@ -23,9 +16,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { icon: MdDashboard, label: "Escritorio", href: "/admin" },
   { icon: MdAutoStories, label: "Ediciones", href: "/admin/ediciones" },
-  { icon: MdArticle, label: "Artículos", href: "/admin/articulos" },
   { icon: MdSettings, label: "Configuración", href: "/admin/configuracion" },
 ];
 

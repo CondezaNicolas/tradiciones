@@ -8,7 +8,7 @@ import { SiteBrand } from "@/components/site-brand";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin/ediciones";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
