@@ -1,20 +1,28 @@
-"use client";
-
 import {
   IoCallOutline,
   IoLogoWhatsapp,
   IoMailOutline,
   IoLocationOutline,
 } from "react-icons/io5";
+import type { IconType } from "react-icons";
 
-const contactInfo = [
-  { icon: IoCallOutline, label: "+56 2 2345 6789" },
-  { icon: IoLogoWhatsapp, label: "+56 9 8765 4321" },
-  { icon: IoMailOutline, label: "contacto@chilepaisdetradiciones.cl" },
-  { icon: IoLocationOutline, label: "Providencia 1208, Of. 402, Santiago" },
-];
+interface AgendaContactoProps {
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  address: string | null;
+}
 
-export function AgendaContacto() {
+export function AgendaContacto({ phone, whatsapp, email, address }: AgendaContactoProps) {
+  const contactInfo: { icon: IconType; label: string }[] = [
+    phone ? { icon: IoCallOutline, label: phone } : null,
+    whatsapp ? { icon: IoLogoWhatsapp, label: whatsapp } : null,
+    email ? { icon: IoMailOutline, label: email } : null,
+    address ? { icon: IoLocationOutline, label: address } : null,
+  ].filter((item) => item !== null);
+
+  const whatsappDigits = whatsapp?.replace(/\D/g, "") ?? "";
+
   return (
     <section id="conectemos-en-persona" className="py-24 bg-surface-container-low">
       <div className="max-w-screen-2xl mx-auto px-8">
@@ -41,26 +49,30 @@ export function AgendaContacto() {
 
               <div className="w-12 h-px bg-outline-variant" />
 
-              <div className="space-y-4">
-                {contactInfo.map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <Icon className="text-lg text-on-surface-variant shrink-0" />
-                    <span className="text-on-surface font-body text-sm">
-                      {label}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {contactInfo.length > 0 && (
+                <div className="space-y-4">
+                  {contactInfo.map(({ icon: Icon, label }) => (
+                    <div key={label} className="flex items-center gap-3">
+                      <Icon className="text-lg text-on-surface-variant shrink-0" />
+                      <span className="text-on-surface font-body text-sm">
+                        {label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              <a
-                href="https://wa.me/56987654321"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full bg-primary text-on-primary py-3.5 rounded-md font-body font-bold hover:bg-primary-container transition-colors"
-              >
-                <IoLogoWhatsapp className="text-lg" />
-                Escribir por WhatsApp
-              </a>
+              {whatsappDigits && (
+                <a
+                  href={`https://wa.me/${whatsappDigits}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full bg-primary text-on-primary py-3.5 rounded-md font-body font-bold hover:bg-primary-container transition-colors"
+                >
+                  <IoLogoWhatsapp className="text-lg" />
+                  Escribir por WhatsApp
+                </a>
+              )}
             </div>
           </div>
         </div>

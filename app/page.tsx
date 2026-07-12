@@ -1,6 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { editions } from "@/lib/db/schema";
+import { getContactInfo } from "@/lib/db/site-settings";
 import { EdicionesRecientes, type Edicion } from "@/components/ediciones-recientes";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -44,6 +45,8 @@ const structuredData = {
 export default async function Home() {
   const db = getDb();
 
+  const contact = await getContactInfo(db);
+
   const published = await db
     .select({
       id: editions.id,
@@ -81,7 +84,12 @@ export default async function Home() {
       <main className="flex-1">
         <Hero hasEdiciones={hasEdiciones} />
         <EdicionesRecientes ediciones={ediciones} />
-        <AgendaContacto />
+        <AgendaContacto
+          phone={contact.phone}
+          whatsapp={contact.whatsapp}
+          email={contact.email}
+          address={contact.address}
+        />
       </main>
       <Footer />
     </>

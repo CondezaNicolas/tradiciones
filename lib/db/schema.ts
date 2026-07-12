@@ -53,6 +53,15 @@ export const images = sqliteTable("images", {
   createdAt: timestampColumn("created_at"),
 });
 
+export const siteSettings = sqliteTable("site_settings", {
+  id: text("id").primaryKey(),
+  phone: text("phone"),
+  whatsapp: text("whatsapp"),
+  email: text("email"),
+  address: text("address"),
+  updatedAt: timestampColumn("updated_at").$onUpdate(() => new Date()),
+});
+
 export const adminUsers = sqliteTable("admin_users", {
   id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
