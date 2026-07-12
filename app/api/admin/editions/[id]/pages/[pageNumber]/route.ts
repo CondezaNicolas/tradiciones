@@ -77,10 +77,38 @@ export async function PUT(request: Request, context: RouteContext) {
 
     // Try to find existing page
     const [existing] = await db
-      .select({ id: pages.id })
+      .select({ id: pages.id, fabricJson: pages.fabricJson })
       .from(pages)
       .where(and(eq(pages.editionId, id), eq(pages.pageNumber, page)))
       .limit(1);
+
+    if (existing) {
+      // Safety net: an empty layout with no thumbnail is the signature of a
+      // client saving an already-disposed canvas. Never let it overwrite a
+      // page that has real content.
+      const incomingObjects = (fabricJson as { objects?: unknown[] } | null)
+        ?.objects;
+      const incomingIsEmpty =
+        !Array.isArray(incomingObjects) || incomingObjects.length === 0;
+
+      if (incomingIsEmpty && !thumbnailUrl && existing.fabricJson) {
+        try {
+          const existingObjects = (
+            JSON.parse(existing.fabricJson) as { objects?: unknown[] }
+          ).objects;
+          if (Array.isArray(existingObjects) && existingObjects.length > 0) {
+            const [current] = await db
+              .select()
+              .from(pages)
+              .where(eq(pages.id, existing.id))
+              .limit(1);
+            return NextResponse.json(current);
+          }
+        } catch {
+          // Existing fabricJson unparsable — allow the update to proceed
+        }
+      }
+    }
 
     if (existing) {
       // Update existing page

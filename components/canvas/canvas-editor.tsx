@@ -28,6 +28,20 @@ function saveReducer(state: SaveState, action: { type: "show" } | { type: "hide"
 
 export default function CanvasEditor({ pageIndex, width, height, editionId, onSave }: CanvasEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  /*
+   * Final save on unmount. React runs effect cleanups in definition order, so
+   * this effect MUST be defined before useFabric: its cleanup then runs before
+   * fabric's dispose(). Reading the canvas after dispose() yields an empty
+   * objects array, which used to overwrite the saved page with a blank one.
+   */
+  const unmountSaveRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    return () => {
+      unmountSaveRef.current();
+    };
+  }, []);
+
   const { fabricCanvas, isReady } = useFabric(canvasRef, width, height);
 
   const hasLoadedRef = useRef(false);
@@ -47,6 +61,14 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
     if (!isReady || !fabricCanvas) return;
 
     const performSave = () => {
+      // Never persist a canvas that fabric already disposed — it reads back
+      // as empty and would wipe the stored page.
+      const lifecycle = fabricCanvas as unknown as {
+        disposed?: boolean;
+        destroyed?: boolean;
+      };
+      if (lifecycle.disposed || lifecycle.destroyed) return;
+
       const json = fabricCanvas.toJSON();
       let thumbnail: string | undefined;
       try {
@@ -113,6 +135,9 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
     // Register with CanvasProvider so tools know about this canvas
     registerCanvas(pageIndex, fabricCanvas);
 
+    // Expose the save for the unmount effect (runs before fabric dispose)
+    unmountSaveRef.current = performSave;
+
     // Load existing page state from store (one-time per mount)
     if (!hasLoadedRef.current) {
       hasLoadedRef.current = true;
@@ -148,42 +173,9 @@ export default function CanvasEditor({ pageIndex, width, height, editionId, onSa
     }
 
     return () => {
-      // Force immediate save on unmount (preserves work when closing editor)
-      try {
-        if (fabricCanvas) {
-          const json = fabricCanvas.toJSON();
-          let thumbnail: string | undefined;
-          try {
-            thumbnail = fabricCanvas.toDataURL({
-              format: "jpeg",
-              quality: 0.6,
-              multiplier: 0.5,
-            });
-          } catch {
-            // Silently ignore
-          }
-          if (editionId) {
-            pageStore
-              .savePageApi(
-                editionId,
-                pageIndex,
-                json as Record<string, unknown>,
-                thumbnail,
-              )
-              .catch(() => {});
-          } else {
-            pageStore
-              .savePage(pageIndex, json as Record<string, unknown>, thumbnail)
-              .catch(() => {});
-          }
-
-          if (thumbnail) {
-            onSaveRef.current?.(thumbnail);
-          }
-        }
-      } catch {
-        // Guard against errors during unmount save
-      }
+      // The actual unmount save runs in the effect defined before useFabric —
+      // by the time this cleanup executes, fabric may already be disposed.
+      unmountSaveRef.current = () => {};
 
       fabricCanvas.off("object:modified");
       fabricCanvas.off("object:added");
