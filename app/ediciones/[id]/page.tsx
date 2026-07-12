@@ -1,16 +1,18 @@
 import { eq, and } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { getDb } from "@/lib/db";
 import { editions, pages } from "@/lib/db/schema";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { MagazineViewer } from "@/components/magazine-viewer";
+import { SITE_URL, SITE_NAME, absoluteUrl } from "@/lib/seo";
 import { IoArrowBackOutline } from "react-icons/io5";
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const db = getDb();
 
@@ -18,18 +20,59 @@ export async function generateMetadata({ params }: PageProps) {
     .select({
       title: editions.title,
       category: editions.category,
+      month: editions.month,
+      year: editions.year,
+      summary: editions.summary,
+      coverImageUrl: editions.coverImageUrl,
+      createdAt: editions.createdAt,
     })
     .from(editions)
     .where(and(eq(editions.id, id), eq(editions.status, "published")))
     .limit(1);
 
   if (!edition) {
-    return { title: "Edición no encontrada" };
+    return {
+      title: "Edición no encontrada",
+      robots: { index: false, follow: false },
+    };
   }
 
+  const description =
+    edition.summary ??
+    `Edición ${edition.category} de ${edition.month} ${edition.year} de ${SITE_NAME}: tradiciones, cultura y fotografía documental de Chile.`;
+  const canonicalPath = `/ediciones/${id}`;
+  const coverImage = edition.coverImageUrl ?? "/images/hero-background.webp";
+
   return {
-    title: `${edition.title} — Chile País de Tradiciones`,
-    description: `Edición de ${edition.category}`,
+    title: `${edition.title} · ${edition.month} ${edition.year}`,
+    description,
+    alternates: {
+      canonical: canonicalPath,
+    },
+    openGraph: {
+      type: "article",
+      url: absoluteUrl(canonicalPath),
+      siteName: SITE_NAME,
+      locale: "es_CL",
+      title: `${edition.title} · ${edition.month} ${edition.year}`,
+      description,
+      section: edition.category,
+      publishedTime: edition.createdAt?.toISOString(),
+      images: [
+        {
+          url: coverImage,
+          width: 920,
+          height: 1280,
+          alt: `Portada: ${edition.title}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${edition.title} · ${edition.month} ${edition.year}`,
+      description,
+      images: [coverImage],
+    },
   };
 }
 
@@ -46,6 +89,8 @@ export default async function EdicionDetailPage({ params }: PageProps) {
       year: editions.year,
       summary: editions.summary,
       coverImageUrl: editions.coverImageUrl,
+      createdAt: editions.createdAt,
+      updatedAt: editions.updatedAt,
     })
     .from(editions)
     .where(and(eq(editions.id, id), eq(editions.status, "published")))
@@ -68,8 +113,41 @@ export default async function EdicionDetailPage({ params }: PageProps) {
 
   const dateLabel = `${edition.month} ${edition.year}`;
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": absoluteUrl(`/ediciones/${edition.id}`),
+    headline: edition.title,
+    description:
+      edition.summary ?? `Edición ${edition.category} de ${dateLabel}`,
+    articleSection: edition.category,
+    inLanguage: "es-CL",
+    image: edition.coverImageUrl ? [edition.coverImageUrl] : undefined,
+    datePublished: edition.createdAt?.toISOString(),
+    dateModified: edition.updatedAt?.toISOString(),
+    mainEntityOfPage: absoluteUrl(`/ediciones/${edition.id}`),
+    isPartOf: {
+      "@type": "Periodical",
+      "@id": `${SITE_URL}/#periodical`,
+      name: SITE_NAME,
+    },
+    author: { "@type": "Organization", name: SITE_NAME },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/images/logo.png"),
+      },
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <Header />
       <main className="flex-1">
         <div className="mx-auto max-w-screen-2xl px-5 pt-32 md:px-8">
