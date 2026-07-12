@@ -37,7 +37,7 @@ function MaterialIcon({ className, name }: MaterialIconProps) {
   );
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({ address }: { address: string | null }) {
   const { push, refresh } = useRouter();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -106,7 +106,11 @@ export function AdminSidebar() {
           />
           <div className="min-w-0">
             <p className="truncate font-label text-sm font-bold">Editorial Admin</p>
-            <p className="truncate font-label text-[10px] text-on-surface-variant">SANTIAGO, CHILE</p>
+            {address && (
+              <p className="truncate font-label text-[10px] uppercase text-on-surface-variant">
+                {address}
+              </p>
+            )}
           </div>
         </div>
 

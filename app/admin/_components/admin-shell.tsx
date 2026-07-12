@@ -4,7 +4,12 @@ import { usePathname } from "next/navigation";
 
 import { AdminSidebar } from "./admin-sidebar";
 
-export function AdminShell({ children }: Readonly<{ children: React.ReactNode }>) {
+interface AdminShellProps {
+  children: React.ReactNode;
+  address: string | null;
+}
+
+export function AdminShell({ children, address }: AdminShellProps) {
   const pathname = usePathname();
 
   if (pathname === "/admin/login") {
@@ -13,7 +18,7 @@ export function AdminShell({ children }: Readonly<{ children: React.ReactNode }>
 
   return (
     <div className="min-h-screen bg-surface text-on-surface">
-      <AdminSidebar />
+      <AdminSidebar address={address} />
       <main className="ml-64 min-h-screen bg-surface max-[980px]:ml-0">{children}</main>
     </div>
   );

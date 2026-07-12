@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getDb } from "@/lib/db";
+import { getContactInfo } from "@/lib/db/site-settings";
 import { AdminShell } from "./_components/admin-shell";
 
 export const metadata: Metadata = {
@@ -6,10 +8,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({
+export const dynamic = "force-dynamic";
+
+export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <AdminShell>{children}</AdminShell>;
+  const db = getDb();
+  const { address } = await getContactInfo(db);
+
+  return <AdminShell address={address}>{children}</AdminShell>;
 }
