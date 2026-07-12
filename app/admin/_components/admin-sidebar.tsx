@@ -11,7 +11,6 @@ import {
   MdAutoStories,
   MdDashboard,
   MdLogout,
-  MdPermMedia,
   MdSettings,
 } from "react-icons/md";
 
@@ -27,7 +26,6 @@ const NAV_ITEMS: NavItem[] = [
   { icon: MdDashboard, label: "Escritorio", href: "/admin" },
   { icon: MdAutoStories, label: "Ediciones", href: "/admin/ediciones" },
   { icon: MdArticle, label: "Artículos", href: "/admin/articulos" },
-  { icon: MdPermMedia, label: "Multimedia", href: "/admin/multimedia" },
   { icon: MdSettings, label: "Configuración", href: "/admin/configuracion" },
 ];
 
