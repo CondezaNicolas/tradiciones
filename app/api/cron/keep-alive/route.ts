@@ -13,11 +13,19 @@ import { getSupabaseAdminClient } from "@/lib/storage/server";
  */
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const authHeader = request.headers.get("authorization");
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-    }
+
+  // Fail closed: without a configured secret the endpoint would be publicly
+  // callable, so refuse to run until CRON_SECRET is set.
+  if (!cronSecret) {
+    return NextResponse.json(
+      { error: "CRON_SECRET no está configurado" },
+      { status: 503 },
+    );
+  }
+
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
   if (process.env.STORAGE_PROVIDER !== "supabase") {

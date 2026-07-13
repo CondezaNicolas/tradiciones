@@ -44,7 +44,7 @@ export function Hero({
               strokeWidth="1.5px"
               strokeColor="rgba(0, 0, 0, 0.95)"
             /> */}
-            Chile, Pais de Tradiciones
+            Chile, País de Tradiciones
           </h1>
           <p className="text-surface-variant text-xl md:text-2xl font-body leading-relaxed mb-10 max-w-xl">
             Descubra las historias no contadas de los guardianes del patrimonio

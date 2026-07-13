@@ -7,7 +7,7 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { Hero } from "@/components/hero";
 import { AgendaContacto } from "@/components/agenda-contacto";
-import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, absoluteUrl } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, absoluteUrl, jsonLdSafe } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -78,7 +78,7 @@ export default async function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSafe(structuredData) }}
       />
       <Header />
       <main className="flex-1">

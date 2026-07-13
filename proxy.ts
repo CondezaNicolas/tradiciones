@@ -2,10 +2,20 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
-const SECRET = new TextEncoder().encode(JWT_SECRET);
-
 const SESSION_COOKIE = "session";
+
+/**
+ * Resolve the signing secret lazily. A missing/weak value throws so the
+ * request fails closed (401/redirect) instead of verifying tokens against
+ * a shared, publicly-known fallback secret.
+ */
+function getSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 16) {
+    throw new Error("JWT_SECRET no está configurado");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -26,9 +36,13 @@ export async function proxy(request: NextRequest) {
   }
 
   try {
-    const { payload } = await jwtVerify(token, SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
 
     const requestHeaders = new Headers(request.headers);
+    // Strip any client-supplied identity headers before we set our own from
+    // the verified token, so they can never be spoofed by the caller.
+    requestHeaders.delete("x-user-id");
+    requestHeaders.delete("x-user-email");
     requestHeaders.set("x-user-id", String(payload.userId));
     requestHeaders.set("x-user-email", String(payload.email ?? ""));
 

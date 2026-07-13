@@ -13,6 +13,44 @@ function sanitizeFilename(filename: string) {
   return filename.replace(/[^a-zA-Z0-9._-]/g, "-");
 }
 
+/**
+ * Sniff the real image type from the file's leading bytes (magic numbers)
+ * instead of trusting the client-supplied `file.type`. Returns the detected
+ * mime type, or null if the content is not a JPEG / PNG / WebP.
+ */
+export async function sniffImageMime(file: File): Promise<string | null> {
+  const header = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+
+  // JPEG: FF D8 FF
+  if (header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff) {
+    return "image/jpeg";
+  }
+  // PNG: 89 50 4E 47 0D 0A 1A 0A
+  if (
+    header[0] === 0x89 &&
+    header[1] === 0x50 &&
+    header[2] === 0x4e &&
+    header[3] === 0x47
+  ) {
+    return "image/png";
+  }
+  // WebP: "RIFF" .... "WEBP"
+  if (
+    header[0] === 0x52 &&
+    header[1] === 0x49 &&
+    header[2] === 0x46 &&
+    header[3] === 0x46 &&
+    header[8] === 0x57 &&
+    header[9] === 0x45 &&
+    header[10] === 0x42 &&
+    header[11] === 0x50
+  ) {
+    return "image/webp";
+  }
+
+  return null;
+}
+
 export function getSupabaseAdminClient() {
   const supabaseUrl = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

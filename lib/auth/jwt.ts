@@ -1,7 +1,19 @@
 import { SignJWT, jwtVerify } from "jose";
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
-const SECRET = new TextEncoder().encode(JWT_SECRET);
+/**
+ * Resolve the signing secret from the environment, lazily so a missing
+ * value fails loudly at request time (never falls back to a shared/known
+ * secret that would let anyone forge admin sessions).
+ */
+function getSecret(): Uint8Array {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret.length < 16) {
+    throw new Error(
+      "JWT_SECRET no está configurado (o es demasiado corto). Define una cadena aleatoria de al menos 16 caracteres antes de arrancar.",
+    );
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export const SESSION_COOKIE = "session";
 
@@ -21,7 +33,7 @@ export async function signJwt(payload: SessionPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime("24h")
     .setIssuedAt()
-    .sign(SECRET);
+    .sign(getSecret());
 }
 
 /**
@@ -31,8 +43,11 @@ export async function signJwt(payload: SessionPayload): Promise<string> {
 export async function verifyJwt(
   token: string,
 ): Promise<SessionPayload | null> {
+  // Resolve the secret outside the try so a missing-secret misconfiguration
+  // throws loudly instead of being swallowed as an "invalid token".
+  const secret = getSecret();
   try {
-    const { payload } = await jwtVerify<SessionPayload>(token, SECRET);
+    const { payload } = await jwtVerify<SessionPayload>(token, secret);
     return payload;
   } catch {
     return null;

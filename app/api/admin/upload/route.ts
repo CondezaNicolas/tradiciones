@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { getAuthUser } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { images } from "@/lib/db/schema";
-import { uploadImageFile } from "@/lib/storage/server";
+import { uploadImageFile, sniffImageMime } from "@/lib/storage/server";
 
 const ALLOWED_TYPES = new Set([
   "image/jpeg",
@@ -44,6 +44,17 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verify the real content type from magic bytes — the client-supplied
+    // `file.type` above can be spoofed. Reject anything that isn't actually
+    // a JPEG / PNG / WebP.
+    const sniffedMime = await sniffImageMime(file);
+    if (!sniffedMime || !ALLOWED_TYPES.has(sniffedMime)) {
+      return NextResponse.json(
+        { error: "El contenido del archivo no es una imagen válida" },
+        { status: 400 },
+      );
+    }
+
     const { url } = await uploadImageFile(file);
 
     // Populate images table if editionId is provided
@@ -55,7 +66,7 @@ export async function POST(request: Request) {
         editionId,
         url,
         originalFilename: file.name,
-        mimeType: file.type,
+        mimeType: sniffedMime,
         sizeBytes: file.size,
       });
     }

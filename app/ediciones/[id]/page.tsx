@@ -7,7 +7,7 @@ import { editions, pages } from "@/lib/db/schema";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { MagazineViewer } from "@/components/magazine-viewer";
-import { SITE_URL, SITE_NAME, absoluteUrl } from "@/lib/seo";
+import { SITE_URL, SITE_NAME, absoluteUrl, jsonLdSafe } from "@/lib/seo";
 import { IoArrowBackOutline } from "react-icons/io5";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -142,11 +142,40 @@ export default async function EdicionDetailPage({ params }: PageProps) {
     },
   };
 
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Inicio",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Ediciones",
+        item: absoluteUrl("/#ediciones-recientes"),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: edition.title,
+        item: absoluteUrl(`/ediciones/${edition.id}`),
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdSafe(structuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdSafe(breadcrumbData) }}
       />
       <Header />
       <main className="flex-1">

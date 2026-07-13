@@ -27,3 +27,14 @@ export const SITE_KEYWORDS = [
 export function absoluteUrl(path: string): string {
   return new URL(path, SITE_URL).toString();
 }
+
+/**
+ * Serialise data for injection into a `<script type="application/ld+json">`
+ * tag. `JSON.stringify` alone does not escape `<`, so a value containing
+ * `</script>` (e.g. an edition title) could break out of the tag and inject
+ * markup. Escaping `<` to its unicode form keeps the JSON valid while making
+ * tag-breakout impossible.
+ */
+export function jsonLdSafe(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
